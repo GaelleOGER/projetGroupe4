@@ -1,18 +1,13 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
-# Create your models here.
-class User(models.Model):
-    id = models.IntegerField
-
-
 class Profile(models.Model):
-    id = models.IntegerField
-    user = models.IntegerField
-    points = models.IntegerField
+    points = models.IntegerField(default=10)
     bio = models.CharField(max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
+    first_name = models.CharField(max_length=150, default='User First Name')
+    last_name = models.CharField(max_length=150, default='Last Name')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='user')
 
 
 class Friendship(models.Model):

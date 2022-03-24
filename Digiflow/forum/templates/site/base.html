@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title>
+      {% block head_title %}{% endblock %}
+  </title>
+  {% block extra_head %}
+  {% endblock %}
+   {% include "site/css.html" %}
+</head>
+{% include "site/navbar.html" %}
+<body>
+<div class="mt-5 pt-5">
+{% if messages %}
+    {% for message in messages %}
+    <div class="{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+{% endif %}
+</div>
+
+    <div class="row">
+        <div class="col-10">
+        {% block content %}
+        {% endblock content %}
+        </div>
+        <div class="col-2">
+            {% include "site/sidebar.html" %}
+        </div>
+    </div>
+    {% block extra_body %}
+    {% endblock %}
+    {% include "site/footer.html" %}
+    {% include "site/javascript.html" %}
+    {% block extra_scripts %}
+    {% endblock extra_scripts %}
+</body>
+</html>
