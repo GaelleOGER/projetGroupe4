@@ -21,7 +21,7 @@ class Profiles(models.Model):
 
 class Answer(models.Model):
     profile=models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="profileAnswer", null=True)
-    created_at=models.IntegerField(blank=True, null=True)
+    created_at=models.DateTimeField(null=True)
     body=models.CharField(max_length=15000)
     total_votes=models.IntegerField(blank=True, null=True)
 
@@ -32,7 +32,7 @@ class Answer(models.Model):
 
 class Question(models.Model):
     profile=models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="profileQuestion", null=True)
-    created_at=models.DateTimeField(auto_now_add=True)
+    created_at=models.DateTimeField( null=True)
     title = models.CharField(max_length=150,null=True)
     body=models.CharField(max_length=15000)
     total_votes=models.IntegerField(blank=True, null=True)
@@ -51,8 +51,8 @@ class Friendship(models.Model):
 class Vote(models.Model):
 
     create_at = models.DateTimeField(auto_now_add=True)
-    #emiter_profile = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="emiter_profile", null=True)
-    #recever_profile = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="recever_profile", null=True)
+    emiter_profile = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="emiter_profile", null=True)
+    recever_profile = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="recever_profile", null=True)
     type = models.IntegerField(blank=True, null=True)
     question = models.ForeignKey(Question, on_delete=models.SET_NULL, related_name="VoteQuestion", null=True)
     answer = models.ForeignKey(Answer, on_delete=models.SET_NULL, related_name="VoteAnswer", null=True)
@@ -61,7 +61,7 @@ class Vote(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
-    #id = models.IntegerField
+
 
 class QuestionsTags(models.Model):
     question_id=models.ForeignKey(Question, on_delete=models.SET_NULL, related_name="TagQuestion", null=True)

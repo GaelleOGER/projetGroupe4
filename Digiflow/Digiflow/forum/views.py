@@ -12,9 +12,11 @@ class ProfileDetailView(DetailView):
     model = Profiles
     template_name = "profile.html"
 
-    """def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['profile'] = Profiles.objects.all()
+        context['amies'] = Friendship.objects.all().count()
+        context['question'] = Question.objects.all().order_by('created_at')
+        context['answer'] = Answer.objects.all().order_by('created_at')
+        return context
 
-        return context"""
 
