@@ -4,7 +4,8 @@ from django.contrib.auth.models import User
 
 
 class UserRegistrationForm(UserCreationForm):
-
+    email = forms.EmailField(max_length=50, required=True)
+    username = forms.CharField(max_length=50, required=True)
     class Meta:
         model = User
         fields=['username','email','password1','password2']
@@ -22,3 +23,12 @@ class UserRegistrationForm(UserCreationForm):
             widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
             help_text='',
         )
+
+class UserLoginForm(forms.Form):
+    username=forms.CharField(label="Nom  d'utilisateur",widget=forms.TextInput(attrs={'placeholder': "Entrer votre nom d'utilisateur", 'id':'user'}),max_length=50,required=True)
+    password =forms.CharField(label='Mot de passe',widget=forms.PasswordInput(attrs={'placeholder':'Entrer mot de '
+                                                                                                   'passe',
+                                                                                     'id':'pwd'}),max_length=50,min_length=6,required=True)
+    class Meta:
+        model= User
+        fields=['username','password']

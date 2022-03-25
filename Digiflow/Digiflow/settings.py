@@ -36,12 +36,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-<<<<<<< Updated upstream:Digiflow/Digiflow/Digiflow/settings.py
-=======
     'crispy_forms',
 
     'forum',
->>>>>>> Stashed changes:Digiflow/Digiflow/settings.py
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'

@@ -2,8 +2,10 @@ from django.contrib import messages, auth
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.views import View
+from django.views.generic import ListView
 
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserLoginForm
+from .models import Question
 
 
 class UserRegistrationView(View):
@@ -12,7 +14,6 @@ class UserRegistrationView(View):
     def get(self, request):
         context = {}
         context['form'] = UserRegistrationForm()
-        # param1= request, parm2=template, param3=context
         return render(request, self.template_name, context)
 
     def post(self, request):
@@ -47,4 +48,42 @@ class UserRegistrationView(View):
             messages.success(request, "Enregistré avec succès")
             auth.login(request, user)
 
-            return redirect('forum:')
+            return redirect('forum:login')
+
+
+class UserLoginView(View):
+    template_name = "user_login_form.html"
+
+    def get(self, request):
+        context = {}
+        context['form'] = UserLoginForm()
+        return render(request, self.template_name, context)
+
+
+    def post(self, request):
+        form = UserLoginForm(request.POST or None)
+        username = request.POST['username']
+        password = request.POST['password']
+
+        context = {}
+        context['form'] = UserLoginForm()
+        if username == '':
+            messages.error(request, "Vous n'avez pas rempli de userName")
+            return render(request, self.template_name, context)
+        elif password == '':
+            messages.error(request, "Vous n'avez pas rempli de password")
+            return render(request, self.template_name, context)
+        else:
+            user = auth.authenticate(username=username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                messages.success(request, "Connecté avec succès")
+                return redirect('forum:home')
+            else:
+                messages.error(request, "Utilisateur non trouvé")
+                # param1= request, parm2=template, param3=context
+                return render(request, self.template_name, context)
+
+class HomeView(ListView):
+    model = Question
+    template_name = "home.html"
