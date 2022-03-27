@@ -1,4 +1,5 @@
 # Create your views here.
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
 from django.contrib.auth.models import User
@@ -7,18 +8,6 @@ from django.contrib import messages, auth
 from .forms import AnswerForm
 from .models import Question, QuestionsTags, Answer
 
-
-# class QuestionDetailView(DetailView):
-#
-#     model = Question
-#     template_name = 'question_detail.html'
-#
-#
-#
-#     def get_context_data(self, **kwargs):
-#         context = {}
-#         context['answerpost'] = AnswerForm()
-#         return context
 
 class QuestionDetailView(DetailView):
     model = Question
@@ -30,7 +19,6 @@ class QuestionDetailView(DetailView):
         context['answer'] = Answer.objects.filter(question__pk=self.kwargs['pk'])
 
         return context
-
 
 
 def AnswerSubmit(request, *args, **kwargs):
@@ -49,24 +37,35 @@ def AnswerSubmit(request, *args, **kwargs):
 
     return render(request, 'question_detail.html', context={"form": form})
 
-    #
 
-# def AnswerSubmit(request, *args, **kwargs):
-#     print(request)
-#     priorURL = request.META.get('HTTP_REFERER')
-#     form = AnswerForm(request.POST or None)
-#     print(form)
-#     print("ici")
-#     if form.is_valid():
-#         # pour enregistrer et relier un Answer à un user et à un Question
-#         # il faut pour cela instancier l'user et l'Question
-#         form.instance.question = Question.objects.get(pk=kwargs['pk'])
-#         form.instance.user = request.user
-#         form.save()
-#         messages.success(request, "Vous avez bien créé une réponse !")
-#         return redirect(priorURL)
-#     else:
-#         messages.error(request, "Petit problemo ...!")
-#         return redirect(priorURL)
+def VoteQuestionSetter(request, *args, **kwargs):
+    print(request)
+    print(args)
+    print(kwargs)
+    id_question = Question.objects.get(id=kwargs['pk'])
+    print(id_question)
+    priorURL = request.META.get('HTTP_REFERER')
+
+    # qs = Question.objects.get(pk=kwargs['pk'])
+    # if request.user in qs.total_votes.all():
+    #     qs.total_votes.remove(request.user)
+    # else:
+    #     qs.total_votes.add(request.user)
+
+    return redirect(priorURL)
 
 
+def VoteAnswerSetter(request, *args, **kwargs):
+
+    priorURL = request.META.get('HTTP_REFERER')
+
+    qs = Answer.objects.get(id=kwargs['id'])
+    if request.user in qs.total_votes.all():
+        qs.total_votes.remove(request.user)
+    else:
+        qs.total_votes.add(request.user)
+
+    return redirect(priorURL)
+
+def home(request , *args, **kwargs):
+    return HttpResponse('<h1>Bonjour</h1>')

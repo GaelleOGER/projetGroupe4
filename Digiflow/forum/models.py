@@ -1,3 +1,5 @@
+from datetime import date
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -21,12 +23,9 @@ class Friendship(models.Model):
     friend_two_id = models.IntegerField
 
 
-
-
 class Tag(models.Model):
 
     name = models.CharField(max_length=150)
-
 
 
 class QuestionsTags(models.Model):
@@ -36,33 +35,37 @@ class QuestionsTags(models.Model):
 
 class Question(models.Model):
 
+    tags = models.ManyToManyField(Tag, blank=True, null=True, related_name='tagsquestion')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="userquestion")
     profile = models.IntegerField
-    created_at = models.DateTimeField
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     title = models.CharField(max_length=150)
     body = models.CharField(max_length=500)
-    total_votes = models.IntegerField
+    total_votes = models.IntegerField(blank=True, null=True, default=0)
+    votes_counter = models.PositiveIntegerField(blank=True, null=True, default=0)
 
+    def __str__(self):
+        return str(self.title) or ""
 
 class Answer(models.Model):
 
     question = models.ForeignKey(Question,on_delete=models.SET_NULL, null=True, related_name="questionanswer")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="useranswer")
     profile = models.IntegerField
-    created_at = models.IntegerField
-    body = models.CharField(max_length=150)
-    total_votes = models.IntegerField
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    body = models.CharField(max_length=550)
+    total_votes = models.IntegerField(blank=True, null=True, default=0)
+    votes_counter = models.PositiveIntegerField(blank=True, null=True, default=0)
+
+    def __str__(self):
+        return str(self.pk) or ""
 
     def get_absolute_url(self):
         return reverse('forum:answer-detail', kwargs={'id':self.pk})
 
 class Vote(models.Model):
 
-    question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, related_name="questionanswer")
-    answer = models.ForeignKey(Answer, on_delete=models.SET_NULL, null=True, related_name="questionanswer")
-    created_at = models.DateTimeField
+    question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, related_name="questionvote")
+    answer = models.ForeignKey(Answer, on_delete=models.SET_NULL, null=True, related_name="answervote")
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     emitter_profile = models.IntegerField
-    receiver_profile = models.IntegerField
-    type = models.IntegerField
-    question = models.IntegerField
-    answer = models.IntegerField

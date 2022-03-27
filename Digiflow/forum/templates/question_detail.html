@@ -15,60 +15,57 @@
 
 
                 <p>{{ object.body }}</p>
+                <p>{{ object.created_at }}</p>
 
-
+                 <span>{{ object.total_votes }}</span>
+            </div>
+            <div>
+                <a href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
             </div>
 
-
             <div class="card-footer">
-                 <a class="btn btn-danger" href="#">
-                    retour au questions
+                <a class="btn btn-danger" href="#">
+    retour au questions
                 </a>
 
 
-             </div>
-            {% for each in object_list %}
-            <div class="card-footer">
-                <span class="badge badge-success mr-5"> <i class="fa fa-eye" aria-hidden="true"></i> pop </span>
-
-                {% if request.user.is_authenticated %}
-                <a href="{% url 'forum:set-like' pk=each.pk %}">{% endif %}<i class="fa fa-thumbs-up text-info ml-5"
-                                                                             aria-hidden="true"></i></a>
-
-
-                {% if request.user.is_authenticated %}<a href="{% url 'blog:set-like' pk=each.pk %}">{% endif %}<i
-                    class="fa fa-thumbs-up text-secondary ml-5" aria-hidden="true"></i></a>
 
 
             </div>
-                 {% endfor %}
+        </div>
+        </div>
+        </div>
+        {% for each in object.questionanswer.all %}
+        <div class="col-1">
+        <div class="card">
+            <div class="card-body">
+                <p>R</p>
+            </div>
+        </div>
         </div>
         <div class="card">
-
             <div class="card-body">
-
-
-                {% for each in object.questionanswer.all %}
                 <p>{{ each.body }}</p>
-                {% endfor %}
+                <span>{{ each.total_votes }}</span>
+                <span>{{ each.created_at|date:"D d M Y" }}</span>
             </div>
-
+        </div>
+        {% endfor %}
     </div>
-</div>
 
-<div class="row m-4">
-    <div class="col-6">
-        <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
-        <form method="POST" action="{% url 'forum:answer-create' id=object.id %}">
-            <div>
-                {% csrf_token %}
-                {% crispy form %}
+    <div class="row m-4">
+        <div class="col-6">
+            <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
+            <form action="{% url 'forum:answer-create' id=object.id %}" method="POST">
+                <div>
+                    {% csrf_token %}
+                    {% crispy form %}
 
-                <button type="submit" class="btn btn-success mt-3 ml-3"> Envoyer</button>
-            </div>
-        </form>
+                    <button class="btn btn-success mt-3 ml-3" type="submit"> Envoyer</button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 </div>
 
 {% endblock content %}
