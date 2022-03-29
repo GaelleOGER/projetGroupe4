@@ -1,36 +1,52 @@
 
 {% include "css.html" %}
-
+{% load static %}
 <body>
 <div class="container mt-4 mb-4 p-3 d-flex justify-content-center">
     <div class="card p-4">
-        <div class=" image d-flex flex-column justify-content-center align-items-center"> <button class="btn btn-secondary"> <img src="https://i.imgur.com/wvxPV9S.png" height="100" width="100" /></button>
+        <div class=" image d-flex flex-column justify-content-center align-items-center">
+            <button class="btnPer btn-secondary"> <img src="https://i.imgur.com/wvxPV9S.png" height="100" width="100" /></button>
             <span class="name mt-3">{{object.first_name}} {{object.last_name}}  </span>
             <span class="idd">Points: {{object.points}} </span>
-            <div class="d-flex flex-row justify-content-center align-items-center mt-3"> <span class="number">{{amies}} <span class="follow">Amies</span></span> </div>
-            <div class=" d-flex mt-2"> <button class="btn1 btn-dark">Edit Profile</button> </div>
+            <div class="d-flex flex-row justify-content-center align-items-center mt-3">
+                <span class="number">{{amies}}
+                    <span class="follow">Amies</span>
+                    <a href="{% url 'forum:ajouter-amie' %}">
+                    <i class="fa fa-user-plus"></i>
+                    </a>
+                </span>
+            </div>
+            <div class=" d-flex mt-2">
+                <a href="{% url 'forum:user-profileupdate' pk=object.pk %}" >
+                    <button class="btn1">Edit Profile</button>
+                </a>
+             </div>
             <div class="text mt-3"> <span>Bio: {{object.bio}}</span> </div>
             <div class="gap-3 mt-3 icons d-flex flex-row justify-content-center align-items-center"> <span><i class="fa fa-twitter"></i></span> <span><i class="fa fa-facebook-f"></i></span> <span><i class="fa fa-instagram"></i></span> <span><i class="fa fa-linkedin"></i></span> </div>
-            <div class=" px-2 rounded mt-4 date "> <span class="join">Joined May,2021</span> </div>
+            <div class=" px-2 rounded mt-4 date "> <span class="join">{{date_joind}}</span> </div>
+
         </div>
     </div>
 </div>
+
 
 <div class="container mt-4 mb-4 p-3 d-flex justify-content-center">
     <h3>DERNIERE ACTIVITE</h3>
 </div>
 
-<div class="container2 mt-4 mb-4 p-3 d-flex justify-content-center">
+<div class="container mt-4 mb-4 p-3 d-flex justify-content-center">
+
     {% for each in question %}
 
-    <div class="card2 p-4"> <p><strong>Q</strong></p></div>
-    <div class="card p-4"> <p>  {{each.title}} {{each.created_at}}</p></div>
-    <div class="card2 p-4"> <p>{{each.total_votes}}</p></div>
-
+    <div class="row p-3">
+        <div class="card2 p-4"> <p><strong>Q</strong></p></div>>
+        <div class="card p-4"> <p>  {{each.title}} {{each.created_at}}</p></div>
+        <div class="card2 p-4"> <p>{{each.total_votes}}</p></div>
     {% endfor %}
-</div>
-<div class="container2 mt-4 mb-4 p-3 d-flex justify-content-center">
-    {% for each in question %}
+    </div>
+
+    {% for each in answer %}
+    <div class="row p-3">
     <div class="card2 p-4"> <p><strong>R</strong></p></div>
     <div class="card p-4"> <p> {{each.body}} {{each.created_at}}</p></div>
     <div class="card2 p-4"> <p>{{each.total_votes}}</p></div>

@@ -7,21 +7,24 @@ from django.utils.text import slugify
 
 
 class Profiles(models.Model):
-
-    user = models.ForeignKey(User,on_delete=models.SET_NULL, related_name="profileUser", null=True )
-    points = models.IntegerField(blank=True, null=True)
+    # pk
+    user = models.OneToOneField(User,on_delete=models.SET_NULL,null=True, related_name="userprofile")
+    points = models.IntegerField(default=10)
     bio = models.CharField(max_length=15000)
     first_name = models.CharField(max_length=30)
     last_name=models.CharField(max_length=30)
-    image = models.ImageField(upload_to='static/images/article', blank=True, null=True)
+    image = models.ImageField(upload_to='static/images', blank=True, null=True)
+    friendlist = models.ManyToManyField(User)
 
     def __str__(self):
-        return str(self.user) or ""
+        return str(self.first_name) or ""
 
+    def get_absolute_url(self):
+        return reverse('forum:user-profile', kwargs={'pk': self.pk})
 
 class Answer(models.Model):
     profile=models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="profileAnswer", null=True)
-    created_at=models.DateTimeField(null=True)
+    created_at=models.DateTimeField(auto_now_add=True, null=True, blank=True)
     body=models.CharField(max_length=15000)
     total_votes=models.IntegerField(blank=True, null=True)
 
@@ -32,7 +35,7 @@ class Answer(models.Model):
 
 class Question(models.Model):
     profile=models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="profileQuestion", null=True)
-    created_at=models.DateTimeField( null=True)
+    created_at=models.DateTimeField(auto_now_add=True, null=True, blank=True)
     title = models.CharField(max_length=150,null=True)
     body=models.CharField(max_length=15000)
     total_votes=models.IntegerField(blank=True, null=True)
@@ -42,15 +45,9 @@ class Question(models.Model):
 
 
 
-
-class Friendship(models.Model):
-
-    friend_one_id = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="Friendship", null=True)
-    friend_two_id = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="Friendship2", null=True)
-
 class Vote(models.Model):
 
-    create_at = models.DateTimeField(auto_now_add=True)
+    create_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     emiter_profile = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="emiter_profile", null=True)
     recever_profile = models.ForeignKey(Profiles, on_delete=models.SET_NULL, related_name="recever_profile", null=True)
     type = models.IntegerField(blank=True, null=True)
