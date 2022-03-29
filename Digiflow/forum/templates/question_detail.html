@@ -1,0 +1,79 @@
+{% extends "site/base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="row m-4">
+    <div class="col-8">
+        <div class="card">
+
+            <div class="card-body">
+
+                <h1 class=""><strong>{{object.title}}</strong></h1>
+
+
+                <p>{{ object.body }}</p>
+                <p>{{ object.created_at }}</p>
+                <h5>nombre de vote</h5>
+                <span class="badge badge-success">{{object.questionvote.profile.count}}</span>
+            </div>
+            <div>
+                {% if request.user in object.questionvote.profile.all %}
+                <a href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
+                {% else %}
+                <a href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
+                {% endif %}
+
+            </div>
+
+            <div class="card-footer">
+                <a class="btn btn-danger" href="#">
+                    retour au questions
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% for each in object.questionanswer.all %}
+<div class="row1">
+    <div class="col-1">
+        <div class="card">
+            <p class="card-body">
+                R
+            </p>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <p>{{ each.body }}</p>
+
+        <div>
+            <h5>nombre de vote</h5>
+            <span class="badge badge-success">{{each.answervote.profile.count}}</span>
+            <a href="{% url 'forum:answer-vote' pk=each.pk %}">vote</a>
+        </div>
+        <span>{{ each.created_at|date:"D d M Y" }}</span>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+<div class="row m-1">
+    <div class="col-12">
+        <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
+        <form action="{% url 'forum:answer-create' id=object.id %}" method="POST">
+            <div>
+                {% csrf_token %}
+                {% crispy form %}
+
+                <button class="btn btn-success mt-3 ml-3" type="submit"> Envoyer</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+
+{% endblock content %}
