@@ -13,6 +13,7 @@ urlpatterns = [
     path('tag/<str:slug>/', TagView.as_view(), name="tag"),
     path('question/<int:pk>/', QuestionDetailView.as_view(), name='questiondetail'),
     path('answer-create/<int:id>/', AnswerSubmit, name='answer-create'),
+    path('question-create/', QuestionCreateView.as_view(), name='question-create'),
     path('question-vote/<int:pk>/', ChangeVoteReponse, name="question-vote"),
     path('answer-vote/<int:pk>/', ChangeVoteAnswer, name="answer-vote"),
     path('createprofile', ProfiCreatetView.as_view(), name="create-profile"),

@@ -4,49 +4,40 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-
-<div class="row m-4">
-    <div class="col-8">
-        <div class="card">
-
-            <div class="card-body">
-
-                <h1 class=""><strong>{{object.title}}</strong></h1>
-
-
-                <p>{{ object.body }}</p>
-                <p>{{ object.created_at }}</p>
-                <h5>nombre de vote</h5>
-                <span class="badge badge-success">{{object.questionvote.profile.count}}</span>
-            </div>
-            <div>
-                {% if request.user in object.questionvote.profile.all %}
-                <a href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
-                {% else %}
-                <a href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
-                {% endif %}
-
-            </div>
-
-            <div class="card-footer">
-                <a class="btn btn-danger" href="#">
-                    retour au questions
-                </a>
-            </div>
+<div class="container-fluid">
+    <div class="card  shadow rounded">
+        <div class="card-body">
+            <h1 class=""><strong>{{object.title}}</strong></h1>
+            <p>{{ object.body }}</p>
+            <p>{{ object.created_at }}</p>
+            <h5>nombre de vote</h5>
+            <span class="badge badge-success">{{object.questionvote.profile.count}}</span>
+        </div>
+        <div>
+            {% if request.user in object.questionvote.profile.all %}
+            <a href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
+            {% else %}
+            <a href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
+            {% endif %}
+        </div>
+        <div class="card-footer">
+            <a class="btn btn-danger" href="#">
+                retour au questions
+            </a>
         </div>
     </div>
 </div>
-{% for each in object.questionanswer.all %}
-<div class="row1">
-    <div class="col-1">
-        <div class="card">
-            <p class="card-body">
-                R
-            </p>
+
+
+<div class="container-fluid">
+    {% for each in object.questionanswer.all %}
+    <div class="row">
+        <div class="card shadow rounded">
+            <p class="card-body">R</p>
         </div>
     </div>
 </div>
-<div class="card">
+<div class="card shadow rounde">
     <div class="card-body">
         <p>{{ each.body }}</p>
 
@@ -60,11 +51,11 @@
 </div>
 {% endfor %}
 </div>
-
+</div>
 <div class="row m-1">
     <div class="col-12">
         <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
-        <form action="{% url 'forum:answer-create' id=object.id %}" method="POST">
+        <form action="{% url 'forum:answer-create' id=object.id %}"  method="POST">
             <div>
                 {% csrf_token %}
                 {% crispy form %}
