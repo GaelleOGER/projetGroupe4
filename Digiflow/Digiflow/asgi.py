@@ -1,5 +1,5 @@
 """
-ASGI config for Digiflow project.
+ASGI config for DigiflowGoodbye project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

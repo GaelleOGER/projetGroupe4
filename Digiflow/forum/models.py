@@ -59,11 +59,16 @@ class Friend(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=150)
+    slug = models.SlugField(null=True, blank=True)
 
-
-class QuestionsTags(models.Model):
-    question_id = models.IntegerField
-    tag_id = models.IntegerField
+    def save(self, *args, **kwargs):
+        if self.slug and self.name.isupper():
+            self.name =self.name.upper()
+            super(Tag, self).save(*args, **kwargs)
+        else:
+            self.name = self.name.upper()
+            self.slug = slugify(self.name)
+            super(Tag, self).save(*args, **kwargs)
 
 
 class Question(models.Model):
@@ -100,3 +105,4 @@ class Answer(models.Model):
 class Vote_Answer(models.Model):
     answer = models.OneToOneField(Answer, on_delete=models.SET_NULL, null=True, related_name="answervote")
     profile = models.ManyToManyField(User, related_name="useranswervote")
+
