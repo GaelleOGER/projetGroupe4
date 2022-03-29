@@ -1,1 +1,1 @@
-default_app_config= 'forum.apps.ForumConfig'
+default_app_config = 'forum.apps.ForumConfig'
