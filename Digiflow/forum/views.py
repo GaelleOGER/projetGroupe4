@@ -108,6 +108,16 @@ class QuestionDetailView(DetailView):
         return context
 
 
+class QuestionCreateView(CreateView):
+    model = Question
+    template_name = 'question-create.html'
+    fields = ['title', 'body']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+
 def AnswerSubmit(request, *args, **kwargs):
     priorURL = request.META.get('HTTP_REFERER')
     if request.method == "POST":

@@ -57,3 +57,5 @@ class AnswerForm(forms.ModelForm):
         super(AnswerForm, self).__init__(*args, **kwargs)
         self.fields['body'] = forms.CharField(max_length=1500, required=True,
                                               widget=forms.Textarea(attrs={'class': 'form-control'}))
+
+

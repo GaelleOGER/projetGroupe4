@@ -82,6 +82,10 @@ class Question(models.Model):
     def __str__(self):
         return str(self.title) or ""
 
+    def get_absolute_url(self):
+        return reverse('forum:questiondetail',
+                       kwargs={'pk': self.pk}
+                       )
 
 class Vote_Question(models.Model):
     question = models.OneToOneField(Question, on_delete=models.SET_NULL, null=True, related_name="questionvote")
