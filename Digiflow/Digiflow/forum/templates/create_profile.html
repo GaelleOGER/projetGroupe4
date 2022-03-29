@@ -1,0 +1,17 @@
+{% include "css.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+<title>Create profile</title>
+
+
+<body>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" class="btn btn-success mt-3" value="Create">
+</form>
+<a href="" >
+<button class="btn btn-danger mt-3">Cancel</button>
+</a>
+</body>
+

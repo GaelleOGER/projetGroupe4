@@ -1,0 +1,11 @@
+
+
+
+<h5 class="mt-5">Catégorie à voire</h5>
+<ul>
+    {% for each in category %}
+        <li>
+            <a href="{% url 'blog:category-filter' slug=each.slug %}">{{ each.titre|capfirst }}</a>
+        </li>
+    {% endfor %}
+</ul>
