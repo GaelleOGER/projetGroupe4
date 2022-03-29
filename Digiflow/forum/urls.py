@@ -15,6 +15,8 @@ urlpatterns = [
     path('profile/<int:pk>/update', ProfileUpdateView.as_view(), name="user-profileupdate"),
     path('profileList', ProfileListView.as_view(), name="ajouter-amie"),
     path('Addfriend/<int:pk>/', AddAmie, name="add-friend"),
+    path('following/<str:slug>', FollowingListOfUser.as_view(), name="following-list"),
+    path('follower/<str:slug>', FollowerListOfUser.as_view(), name="follower-list"),
     path('', home, name="home"),
 
 

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Question, Answer, Vote_Question, Vote_Answer, Profiles, Tag, QuestionsTags
+from .models import Question, Answer, Vote_Question, Vote_Answer, Profiles, Tag, QuestionsTags, Friend
 from import_export.admin import ImportExportModelAdmin
 
 
@@ -32,3 +32,4 @@ admin.site.register(Vote_Question, Vote_Question_Admin)
 admin.site.register(Vote_Answer, Vote_Answer_Admin)
 admin.site.register(Tag)
 admin.site.register(QuestionsTags)
+admin.site.register(Friend)

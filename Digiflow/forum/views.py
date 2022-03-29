@@ -162,3 +162,22 @@ def ChangeVoteAnswer(request, *args, **kwargs):
 
 def home(request, *args, **kwargs):
     return HttpResponse('<h1>Bonjour</h1>')
+
+class FollowingListOfUser(DetailView):
+    model = Profiles
+    template_name = 'following.html'
+    print(Profiles.user)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['following'] = Profiles.objects.all()
+        print(context)
+        return context
+
+class FollowerListOfUser(DetailView):
+    model = Profiles
+    template_name = 'follower.html' #object.follower.all, object.following.all dans template in for loop
+    """def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['follower_'] = Profile.objects.all()
+        return context"""
+
