@@ -1,0 +1,17 @@
+{% include "css.html" %}
+
+    <title>Update profile</title>
+
+<body>
+<form method="post">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+    <input type="submit" class="btn btn-success mt-3" value="Update">
+
+
+</form>
+<a href="{% url 'forum:user-profile' pk=object.pk %}" >
+<button class="btn btn-danger mt-3">Cancel</button>
+</a>
+</body>

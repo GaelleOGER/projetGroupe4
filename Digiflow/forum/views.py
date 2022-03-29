@@ -3,9 +3,15 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
 from django.contrib.auth.models import User
-
 from django.contrib import messages, auth
-from .forms import AnswerForm
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.urls import reverse
+from django.views import View
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+
+from .forms import UserRegistrationForm, UserLoginForm, TagForm, AnswerForm
 
 from .models import *
 
@@ -23,6 +29,7 @@ class ProfiCreatetView(CreateView):
     """def form_valid(self, form):
         form.instance.author = self.request.user
         return super().form_valid(form)"""
+
 
 class ProfileDetailView(DetailView):
     model = Profiles
@@ -42,16 +49,11 @@ class ProfileListView(ListView):
     model = Profiles
     template_name = "profile_list.html"
 
-
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         id_auth = self.request.user.id
         context['profile_list'] = Profiles.objects.exclude(user__id=id_auth)
         return context
-
-
-
-
 
 
 """class AjouteAmieCreateView(CreateView):
@@ -64,8 +66,6 @@ class ProfileListView(ListView):
         return context"""
 
 
-
-
 class ProfileUpdateView(UpdateView):
     model = Profiles
     template_name = 'profile_update.html'
@@ -75,8 +75,8 @@ class ProfileUpdateView(UpdateView):
         form.instance.author = self.request.user
         return super().form_valid(form)"""
 
-def AddAmie (request, *args, **kwargs):
 
+def AddAmie(request, *args, **kwargs):
     priorURL = request.META.get('HTTP_REFERER')
     user_cliquer = User.objects.get(id=kwargs['pk'])
     id_user = request.user
@@ -124,6 +124,7 @@ def AnswerSubmit(request, *args, **kwargs):
 
     return render(request, 'question_detail.html', context={"form": form})
 
+
 # nous avons deux vue qui nous permettent de défenir si c 'est une question ou une réponse
 # donc deux url et relatif
 # pour les question reverse d'url dans la template avec l'id de la question
@@ -163,21 +164,154 @@ def ChangeVoteAnswer(request, *args, **kwargs):
 def home(request, *args, **kwargs):
     return HttpResponse('<h1>Bonjour</h1>')
 
+
 class FollowingListOfUser(DetailView):
     model = Profiles
     template_name = 'following.html'
     print(Profiles.user)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['following'] = Profiles.objects.all()
         print(context)
         return context
 
+
 class FollowerListOfUser(DetailView):
     model = Profiles
-    template_name = 'follower.html' #object.follower.all, object.following.all dans template in for loop
+    template_name = 'follower.html'  # object.follower.all, object.following.all dans template in for loop
     """def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['follower_'] = Profile.objects.all()
         return context"""
 
+
+class UserRegistrationView(View):
+    template_name = "user_registration_form.html"
+
+    def get(self, request):
+        context = {}
+        context['form'] = UserRegistrationForm()
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = UserRegistrationForm(request.POST or None)
+        if form.is_valid():
+            # do something
+            pass
+        username = request.POST['username']
+        email = request.POST['email']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+
+        context = {}
+        context['form'] = UserRegistrationForm()
+        if username == '':
+            messages.error(request, "Vous n'avez pas rempli de userName")
+            return render(request, self.template_name, context)
+        elif (password1 == '') | (password2 == ''):
+            messages.error(request, "Vous n'avez pas rempli les champs de password")
+            return render(request, self.template_name, context)
+        elif password1 != password2:
+            messages.error(request, "Les deux password sont différents")
+            return render(request, self.template_name, context)
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, "nom d'utilisateur existant")
+            return render(request, self.template_name, context)
+        elif User.objects.filter(email=email).exists():
+            messages.error(request, "L'email existe déjà")
+            return render(request, self.template_name, context)
+        else:
+            user = User.objects.create_user(username=username, email=email, password=password1)
+            messages.success(request, "Enregistré avec succès")
+            auth.login(request, user)
+
+            return redirect('forum:login')
+
+
+class UserLoginView(APIView):
+    permission_classes = [AllowAny]
+    template_name = "user_login_form.html"
+
+    def get(self, request):
+        context = {}
+        context['form'] = UserLoginForm()
+        return render(request, self.template_name, context)
+
+    def post(self, request):
+        form = UserLoginForm(request.POST or None)
+        username = request.POST['username']
+        password = request.POST['password']
+
+        context = {}
+        context['form'] = UserLoginForm()
+        if username == '':
+            messages.error(request, "Vous n'avez pas rempli de userName")
+            return render(request, self.template_name, context)
+        elif password == '':
+            messages.error(request, "Vous n'avez pas rempli de password")
+            return render(request, self.template_name, context)
+        else:
+            user = auth.authenticate(username=username, password=password)
+            if user is not None:
+                auth.login(request, user)
+                messages.success(request, "Connecté avec succès")
+                return redirect('forum:home')
+            else:
+                messages.error(request, "Utilisateur non trouvé")
+                # param1= request, parm2=template, param3=context
+                return render(request, self.template_name, context)
+
+
+def ConnectAjax(request, *args, **kwargs):
+    print('we went throught')
+    form = UserLoginForm(request.POST or None)
+    username = form.data.get('username')
+    password = form.data.get('password')
+    if username == '':
+        messages.error(request, "Vous n'avez pas rempli de userName")
+        return JsonResponse({'data': 'true'})
+    elif password == '':
+        messages.error(request, "Vous n'avez pas rempli de password")
+        return JsonResponse({'data': 'true'})
+    else:
+        user = auth.authenticate(username=username, password=password)
+        if user is not None:
+            auth.login(request, user)
+            messages.success(request, "Connecté avec succès")
+            return JsonResponse({'data': 'true'})
+        else:
+            messages.error(request, "Utilisateur non trouvé")
+            # param1= request, parm2=template, param3=context
+            return JsonResponse({'data': 'true'})
+
+
+class HomeView(ListView):
+    model = Question
+    template_name = "home.html"
+
+
+class TagView(ListView):
+    model = Question
+    template_name = 'tag_list.html'
+
+    def get_context_data(self, **kwargs):
+        for each in Tag.objects.all():
+            each.save()
+        filtrage = Question.objects.filter(tags__slug=self.kwargs['slug'])
+        context = super(TagView, self).get_context_data(object_list=filtrage, **kwargs)
+        context['questions'] = filtrage
+        context['tag'] = Tag.objects.get(slug=self.kwargs['slug'])
+        context['number'] = len(filtrage)
+        return context
+
+
+class TagCreateView(CreateView):
+    model = Tag
+    template_name = 'tag_form.html'
+    form_class = TagForm
+
+    def post(self, request, *args, **kwargs):
+        form = TagForm(request.POST or None)
+        form.save()
+        return render(request, 'home.html', context={"form": form})

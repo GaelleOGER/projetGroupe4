@@ -1,5 +1,5 @@
 """
-WSGI config for Digiflow project.
+WSGI config for DigiflowGoodbye project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
