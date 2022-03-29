@@ -8,13 +8,11 @@
         <div class="card">
             <div class="card-body">
                 <form method="post">
-                    <!-- si div pas là le bouton n'envoi pas les données -->
                     <div>
                     {% csrf_token %}
 
-                <!--version avec mise en page-->
                 {% crispy form %}
-                    <button type="submit" class="btn btn-success">Se connecter</button>
+                    <button type="submit" class="btn btn-success" id="login">Se connecter</button>
                     <a href="{% url 'forum:register' %}" class="btn btn-primary btn-lg active" role="button" aria-pressed="true">S'inscrire</a>
                         </div>
                     </form>
@@ -27,5 +25,22 @@
     </div>
 </div>
 
+# quand l'utilisateur clic sur le boutton submit du formulaire on créer un événement
+# cet evenement asyncron bloque la fonction submit
+# il fait un calld'api sur /api/token avec le packet json du champs username et du champ password
+# on rajoute le access token sous la valeur access dans le local storage
+# la meme chose pour le refresh sous le refresh
+# a partir de ce moment la on submit le formulaire qu'on avait bloqué
 
 {% endblock content %}
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+
+
+{% include 'user_form_ajax.js' %}
+
+
+
+</script>
+{% endblock %}

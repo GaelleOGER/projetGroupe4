@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.text import slugify
 
 
 class Profile(models.Model):
@@ -32,14 +33,32 @@ class Vote(models.Model):
     question = models.IntegerField
     answer = models.IntegerField
 
+class Tag(models.Model):
+    name = models.CharField(max_length=150)
+    slug = models.SlugField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if self.slug and self.name.isupper():
+            self.name =self.name.upper()
+            super(Tag, self).save(*args, **kwargs)
+        else:
+            self.name = self.name.upper()
+            self.slug = slugify(self.name)
+            super(Tag, self).save(*args, **kwargs)
+
+
+
+
 
 class Question(models.Model):
-    id = models.IntegerField
-    profile = models.IntegerField
+    profile = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField
     title = models.CharField(max_length=150)
     body = models.CharField(max_length=150)
     total_votes = models.IntegerField
+    tags = models.ManyToManyField(Tag)
+
+
 
 
 class QuestionsTags(models.Model):
@@ -47,6 +66,4 @@ class QuestionsTags(models.Model):
     tag_id = models.IntegerField
 
 
-class Tag(models.Model):
-    id = models.IntegerField
-    name = models.CharField(max_length=150)
+

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
-from Digiflow.forum.models import Profile
+from models import Profile
 
 
 def user_receiver(sender, instance, created, *args, **kwargs):

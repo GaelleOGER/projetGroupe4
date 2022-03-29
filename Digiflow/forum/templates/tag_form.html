@@ -1,0 +1,22 @@
+{% extends "site/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<!--ouverture de la ligne-->
+<div class="row m-4">
+    <div class="col-6">
+        <form method="post">
+    <div>
+    {% csrf_token %}
+    {% crispy form %}
+      <button class="btn btn-danger mt-3">Cancel</button>
+    <button type="submit" class="btn btn-success mt-3">Envoyer</button>
+        </div>
+</form>
+
+    </div>
+</div>
+
+
+{% endblock content %}
