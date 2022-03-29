@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 
 from django.contrib import messages, auth
 from .forms import AnswerForm
-from .models import Question, QuestionsTags, Answer
+from .models import Question, QuestionsTags, Answer, Vote_Answer, Vote_Question
 
 
 class QuestionDetailView(DetailView):
@@ -37,35 +37,41 @@ def AnswerSubmit(request, *args, **kwargs):
 
     return render(request, 'question_detail.html', context={"form": form})
 
+# nous avons deux vue qui nous permettent de défenir si c 'est une question ou une réponse
+# donc deux url et relatif
+# pour les question reverse d'url dans la template avec l'id de la question
+# et la meme chose pour les reponse
 
-def VoteQuestionSetter(request, *args, **kwargs):
-    print(request)
-    print(args)
-    print(kwargs)
-    id_question = Question.objects.get(id=kwargs['pk'])
-    print(id_question)
+
+def ChangeVoteReponse(request, *args, **kwargs):
     priorURL = request.META.get('HTTP_REFERER')
+    question = Question.objects.get(id=kwargs['pk'])
+    toi = request.user
 
-    # qs = Question.objects.get(pk=kwargs['pk'])
-    # if request.user in qs.total_votes.all():
-    #     qs.total_votes.remove(request.user)
-    # else:
-    #     qs.total_votes.add(request.user)
-
-    return redirect(priorURL)
-
-
-def VoteAnswerSetter(request, *args, **kwargs):
-
-    priorURL = request.META.get('HTTP_REFERER')
-
-    qs = Answer.objects.get(id=kwargs['id'])
-    if request.user in qs.total_votes.all():
-        qs.total_votes.remove(request.user)
+    if toi == question.user:
+        # rajouter le message comm quoi on ne peut pas voté sa propre question
+        return redirect(priorURL)
+    if toi in question.questionvote.profile.all():
+        question.questionvote.profile.remove(toi)
     else:
-        qs.total_votes.add(request.user)
-
+        question.questionvote.profile.add(toi)
     return redirect(priorURL)
 
-def home(request , *args, **kwargs):
+
+def ChangeVoteAnswer(request, *args, **kwargs):
+    priorURL = request.META.get('HTTP_REFERER')
+    answer = Answer.objects.get(id=kwargs['pk'])
+    toi = request.user
+
+    if toi == answer.user:
+        # rajouter le message comm quoi on ne peut pas voté sa propre question
+        return redirect(priorURL)
+    if toi in answer.answervote.profile.all():
+        answer.answervote.profile.remove(toi)
+    else:
+        answer.answervote.profile.add(toi)
+    return redirect(priorURL)
+
+
+def home(request, *args, **kwargs):
     return HttpResponse('<h1>Bonjour</h1>')
