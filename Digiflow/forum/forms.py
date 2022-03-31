@@ -69,4 +69,3 @@ class QuestionForm(forms.ModelForm):
         body = forms.CharField(max_length=300, required=True,
                                widget=forms.Textarea(attrs={'class': 'form-control'}))
 
-
