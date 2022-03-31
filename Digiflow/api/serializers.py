@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from forum.views import Question
 from rest_framework import serializers
 
 
@@ -15,3 +16,9 @@ class UserModelSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+
+class QuestionModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['id', 'title', 'body']

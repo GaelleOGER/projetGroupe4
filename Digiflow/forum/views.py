@@ -1,28 +1,29 @@
 # Create your views here.
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, View
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, View, DeleteView
 from django.contrib.auth.models import User
 from django.contrib import messages, auth
 from django.contrib.auth.models import User
 from django.http import JsonResponse
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.views import View
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
-from .forms import UserRegistrationForm, UserLoginForm, TagForm, AnswerForm
+from .forms import UserRegistrationForm, UserLoginForm, TagForm, AnswerForm, QuestionForm
 
 from .models import *
 
+# PROFILE
 """def profile(request):
-    profile = Profiles.objects.all()
+    profile = Profile.objects.all()
 
     return render(request,'profile.html', {'profile':profile})"""
 
 
-class ProfiCreatetView(CreateView):
-    model = Profiles
+class ProfileCreateView(CreateView):
+    model = Profile
     template_name = "create_profile.html"
     fields = ['first_name', 'last_name', 'image', 'bio']
 
@@ -32,7 +33,7 @@ class ProfiCreatetView(CreateView):
 
 
 class ProfileDetailView(DetailView):
-    model = Profiles
+    model = Profile
     template_name = "profile.html"
 
     def get_context_data(self, **kwargs):
@@ -46,13 +47,13 @@ class ProfileDetailView(DetailView):
 
 
 class ProfileListView(ListView):
-    model = Profiles
+    model = Profile
     template_name = "profile_list.html"
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(**kwargs)
         id_auth = self.request.user.id
-        context['profile_list'] = Profiles.objects.exclude(user__id=id_auth)
+        context['profile_list'] = Profile.objects.exclude(user__id=id_auth)
         return context
 
 
@@ -62,12 +63,12 @@ class ProfileListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['profile'] = Profiles.objects.all()
+        context['profile'] = Profile.objects.all()
         return context"""
 
 
 class ProfileUpdateView(UpdateView):
-    model = Profiles
+    model = Profile
     template_name = 'profile_update.html'
     fields = ['first_name', 'last_name', 'image', 'bio', 'points']
 
@@ -75,6 +76,8 @@ class ProfileUpdateView(UpdateView):
         form.instance.author = self.request.user
         return super().form_valid(form)"""
 
+
+# FRIEND
 
 def AddAmie(request, *args, **kwargs):
     priorURL = request.META.get('HTTP_REFERER')
@@ -89,13 +92,14 @@ def AddAmie(request, *args, **kwargs):
         request.user.userprofile.friendlist.add(user_cliquer)
         request.user.userprofile.save()
     '''
-    for each in Profiles.objects.all():
+    for each in Profile.objects.all():
         each.points = 500
         each.save()
         '''
     return redirect(priorURL)
 
 
+# QUESTION
 class QuestionDetailView(DetailView):
     model = Question
     template_name = 'question_detail.html'
@@ -104,18 +108,7 @@ class QuestionDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['form'] = AnswerForm()
         context['answer'] = Answer.objects.filter(question__pk=self.kwargs['pk'])
-
         return context
-
-
-class QuestionCreateView(CreateView):
-    model = Question
-    template_name = 'question-create.html'
-    fields = ['title', 'body']
-
-    def form_valid(self, form):
-        form.instance.author = self.request.user
-        return super().form_valid(form)
 
 
 def AnswerSubmit(request, *args, **kwargs):
@@ -133,6 +126,61 @@ def AnswerSubmit(request, *args, **kwargs):
         form = AnswerForm()
 
     return render(request, 'question_detail.html', context={"form": form})
+
+
+class QuestionCreateView(CreateView):
+    model = Question
+    template_name = 'question-create.html'
+    fields = ['title', 'body']
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        # ici la logique de point
+        form = QuestionForm(self.request.POST or None)
+        if self.request.user.userprofile.point != 0:
+
+            if form.is_valid():
+                form.save()
+                self.request.user.userprofile.point -= 1
+                self.request.user.userprofile.save()
+                messages.success(self.request, "Votre question a bien été envoyé")
+                return redirect('forum:forum-question')
+            else:
+                messages.error(self.request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")
+                return render(self.request, 'question-create.html')
+
+        return super().form_valid(self, form)
+
+
+class QuestionListView(ListView):
+    model = Question
+    template_name = "landing.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['questions'] = Question.objects.all()
+        dateFormat = Question.created_at
+        return context
+
+
+class QuestionUpdateView(UpdateView):
+    model = Question
+    template_name = "question_update.html"
+    fields = ['title', 'body']
+    success_url = reverse_lazy('forum:forum-question')
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+
+
+class QuestionDeleteView(DeleteView):
+    model = Question
+    template_name = "question_delete.html"
+
+    def get_success_url(self):
+        url = reverse_lazy('forum:forum-question')
+        return redirect(url)
 
 
 # nous avons deux vue qui nous permettent de défenir si c 'est une question ou une réponse
@@ -153,6 +201,8 @@ def ChangeVoteReponse(request, *args, **kwargs):
         question.questionvote.profile.remove(toi)
     else:
         question.questionvote.profile.add(toi)
+
+        return redirect(priorURL)
     return redirect(priorURL)
 
 
@@ -176,19 +226,19 @@ def home(request, *args, **kwargs):
 
 
 class FollowingListOfUser(DetailView):
-    model = Profiles
+    model = Profile
     template_name = 'following.html'
-    print(Profiles.user)
+    print(Profile.user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['following'] = Profiles.objects.all()
+        context['following'] = Profile.objects.all()
         print(context)
         return context
 
 
 class FollowerListOfUser(DetailView):
-    model = Profiles
+    model = Profile
     template_name = 'follower.html'  # object.follower.all, object.following.all dans template in for loop
     """def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -325,3 +375,32 @@ class TagCreateView(CreateView):
         form = TagForm(request.POST or None)
         form.save()
         return render(request, 'home.html', context={"form": form})
+
+
+# pour référence
+def QuestionCreateSurMesure(request, *args, **kwarg):
+    piorURL = request.META.HTTP_REFERER
+    context = {}
+    context['form'] = QuestionForm()
+    if request.user.userprofile.points != 0:
+        form = QuestionForm(request.POST or None)
+        if form.is_valid():
+            form.save()
+            request.user.userprofile.points -= 1
+            request.user.userprofile.save()
+            messages.success(request, "Votre question a bien été envoyé")
+            return redirect('forum:forum-question')
+        else:
+            messages.error(request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")
+            return render(request, '.html', context)
+    else:
+        messages.error(request, "Votre nombre de points est insuffisant")
+        return render(request, '.html', context)
+
+
+def CreateSurMesure(request, *args, **kwarg):
+    priorURL = request.meta.HTTP_REFERER
+    form = QuestionForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+    return redirect(priorURL)

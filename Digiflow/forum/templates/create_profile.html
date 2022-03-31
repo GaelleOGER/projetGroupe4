@@ -6,11 +6,13 @@
 
 <body>
 <form method="post">
+    <div>
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" class="btn btn-success mt-3" value="Create">
+    {{ crispy form}}
+    <button type="submit" class="btn btn-success mt-3" value="Create">Envoyer</button>
+    </div>
 </form>
-<a href="" >
+<a href="{% url 'forum:user-profile' pk=object.pk %}" >
 <button class="btn btn-danger mt-3">Cancel</button>
 </a>
 </body>
