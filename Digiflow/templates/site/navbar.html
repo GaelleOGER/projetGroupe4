@@ -1,0 +1,35 @@
+<div class="container-fluid" style="
+    box-shadow: 1px 1px 12px #aaa;
+    height: 87px;">
+    <div class="row">
+        <div>
+            <h3>Logo</h3>
+
+        </div>
+        <div>
+            <a href="{% url 'forum:question-create' %}">J'ai une question</a>
+        </div>
+        <div class="action">
+            <div class="profile" onclick="menuToggle();">
+                </div>
+            <div class="menu">
+
+                <ul>
+                    <li>
+                        <span class="material-icons icons-size">person</span>
+                        <a href="#">Mon profile</a>
+                    </li>
+                    <li>
+                        <span class="material-icons icons-size">mode</span>
+                        <a href="https://www.w3schools.com/css/css_dropdowns.asp">Modifier profile</a>
+                    </li>
+                    <li>
+                        <span class="material-icons icons-size">insert_comment</span>
+                        <a href="#">Mes questions</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>

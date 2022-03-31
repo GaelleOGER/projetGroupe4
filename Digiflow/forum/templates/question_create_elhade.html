@@ -1,0 +1,45 @@
+{% extends "site/base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<div class="container">
+    <h4>Nouvelle question</h4>
+
+    <form method="post" style="border: solid 1px lightgray; border-radius: 10px; padding: 20px 20px; box-shadow: 1px 1px 12px #aaa;">
+        <div>
+            {% csrf_token %}
+            <label for="basic-url"> Titre</label>
+            <div class="input-group mb-3">
+                {{ form.title }}
+            </div>
+            <label for="basic-url"> Question</label>
+            <div class="input-group mb-3">
+                {{ form.body }}
+            </div>
+            <div class="row">
+                <div class="col-2">
+                    <div class="form-group">
+                        <label for="exampleFormControlSelect1">Tags</label>
+                        <select class="form-control custom-select mr-sm-2" id="exampleFormControlSelect1">
+                            <option selected> --Sélectionner--</option>
+                            <option>tag 1</option>
+                            <option>tag 2</option>
+                            <option>tag 3</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col" style="text-align: end; align-self: center;">
+                    <button class="btn btn-success mt-3 ml-3" id="trigger-button" type="submit"> Envoyer</button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+{% endblock content %}

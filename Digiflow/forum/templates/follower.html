@@ -1,0 +1,32 @@
+{% extends "site/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div>
+    <body>
+    <h1>Profile Page</h1>
+    <hr>
+    {% if user_obj.name == request.user%}
+    <h4>Name: {{user_obj.name}}</h4>
+    <span>Followers: {{followers.count }}</span>
+    <br>
+    <span>Following: {{session_following.another_user.count }}</span>
+    {% else %}
+    <h4>Name: {{user_obj.name}}</h4>
+    <span>Followers: {{followers.count }}</span>
+    <br>
+    <span>Following: {{user_following.another_user.count }}</span>
+    <h4>Profile is Private.</h4>
+    {% endif %}
+    <br><br>
+
+    {% if user_obj.name != request.session.user%}
+    {% if is_followed %}
+        <a href="{% url 'follow' user_obj.name %}" style="border: 1px solid; background: red; padding:10px; color: white;">Unfollow</a>
+    {% else %}
+        <a href="{% url 'follow' user_obj.name %}" style="border: 1px solid; background: yellow; padding:10px; color: black;">Follow</a>
+    {% endif %}
+
+    {% endif %}
+</body>
+</div>
+{% endblock content %}
