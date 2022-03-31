@@ -22,3 +22,10 @@ class QuestionModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'title', 'body']
+
+
+class QuestionDetailModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ['id', 'title', 'body', 'created_at', 'tags', 'user']
+

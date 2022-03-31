@@ -15,11 +15,25 @@ from .forms import UserRegistrationForm, UserLoginForm, TagForm, AnswerForm, Que
 
 from .models import *
 
+# Home
+class HomeView(ListView):
+    model = Question
+    template_name = "home.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #afficher les 10 premiers elements
+        context['tags'] = Tag.objects.all()[:10]
+        context['questions'] = Question.objects.all()
+        context['number'] = len(Question.objects.all())
+        return context
+
+
 # PROFILE
 """def profile(request):
     profile = Profile.objects.all()
 
     return render(request,'profile.html', {'profile':profile})"""
+
 
 
 class ProfileCreateView(CreateView):
@@ -134,22 +148,14 @@ class QuestionCreateView(CreateView):
     fields = ['title', 'body']
 
     def form_valid(self, form):
-        form.instance.author = self.request.user
         # ici la logique de point
-        form = QuestionForm(self.request.POST or None)
         if self.request.user.userprofile.point != 0:
-
-            if form.is_valid():
-                form.save()
-                self.request.user.userprofile.point -= 1
-                self.request.user.userprofile.save()
-                messages.success(self.request, "Votre question a bien été envoyé")
-                return redirect('forum:forum-question')
-            else:
-                messages.error(self.request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")
-                return render(self.request, 'question-create.html')
-
-        return super().form_valid(self, form)
+            self.request.user.userprofile.point -= 1
+            self.request.user.userprofile.save()
+            messages.success(self.request, "Votre question a bien été envoyé")
+        else:
+            messages.error(self.request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")
+        return super().form_valid(form)
 
 
 class QuestionListView(ListView):
@@ -189,7 +195,7 @@ class QuestionDeleteView(DeleteView):
 # et la meme chose pour les reponse
 
 
-def ChangeVoteReponse(request, *args, **kwargs):
+def ChangeVoteQuestion(request, *args, **kwargs):
     priorURL = request.META.get('HTTP_REFERER')
     question = Question.objects.get(id=kwargs['pk'])
     toi = request.user
@@ -199,9 +205,12 @@ def ChangeVoteReponse(request, *args, **kwargs):
         return redirect(priorURL)
     if toi in question.questionvote.profile.all():
         question.questionvote.profile.remove(toi)
+        request.user.userprofile.point -= 1
+        request.user.userprofile.save()
     else:
         question.questionvote.profile.add(toi)
-
+        request.user.userprofile.point += 1
+        request.user.userprofile.save()
         return redirect(priorURL)
     return redirect(priorURL)
 
@@ -221,29 +230,14 @@ def ChangeVoteAnswer(request, *args, **kwargs):
     return redirect(priorURL)
 
 
-def home(request, *args, **kwargs):
-    return HttpResponse('<h1>Bonjour</h1>')
-
-
 class FollowingListOfUser(DetailView):
     model = Profile
     template_name = 'following.html'
-    print(Profile.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['following'] = Profile.objects.all()
-        print(context)
-        return context
 
 
 class FollowerListOfUser(DetailView):
     model = Profile
     template_name = 'follower.html'  # object.follower.all, object.following.all dans template in for loop
-    """def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['follower_'] = Profile.objects.all()
-        return context"""
 
 
 class UserRegistrationView(View):
@@ -344,11 +338,6 @@ def ConnectAjax(request, *args, **kwargs):
             messages.error(request, "Utilisateur non trouvé")
             # param1= request, parm2=template, param3=context
             return JsonResponse({'data': 'true'})
-
-
-class HomeView(ListView):
-    model = Question
-    template_name = "home.html"
 
 
 class TagView(ListView):

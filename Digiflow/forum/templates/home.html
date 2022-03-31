@@ -1,84 +1,44 @@
 {% extends "site/base.html" %}
-
 {% load static %}
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="card  shadow rounded">
-        <div class="card-body">
-            <h1 class=""><strong>{{object.title}}</strong></h1>
-            <p>{{ object.body }}</p>
-            <p>{{ object.created_at }}</p>
-            <h5>nombre de vote</h5>
-            <span class="badge badge-success">{{object.questionvote.profile.count}}</span>
-        </div>
-        <div>
-            {% if request.user in object.questionvote.profile.all %}
-            <a href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
-            {% else %}
-            <a href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
-            {% endif %}
-        </div>
-        <div class="card-footer">
-            <a class="btn btn-danger" href="#">
-                retour au questions
-            </a>
-        </div>
-    </div>
-</div>
 
 
-<div class="container-fluid">
-    {% for each in object.questionanswer.all %}
-    <div class="row">
-        <div class="card shadow rounded">
-            <p class="card-body">R</p>
-        </div>
-    </div>
-</div>
-<div class="card shadow rounde">
-    <div class="card-body">
-        <p>{{ each.body }}</p>
-
-        <div>
-            <h5>nombre de vote</h5>
-            <span class="badge badge-success">{{each.answervote.profile.count}}</span>
-            <a href="{% url 'forum:answer-vote' pk=each.pk %}">vote</a>
-        </div>
-        <span>{{ each.created_at|date:"D d M Y" }}</span>
-    </div>
-</div>
-{% endfor %}
-</div>
-</div>
-{% if request.user.userprofile.point != 0 %}
-<div class="row m-1">
-    <div class="col-12">
-        <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
-        <form action="{% url 'forum:answer-create' id=object.id %}"  method="POST">
-            <div>
-                {% csrf_token %}
-                {% crispy form %}
-
-                <button class="btn btn-success mt-3 ml-3" type="submit"> Envoyer</button>
+ <div class="row">
+                 <div class="col-lg-10 mx-auto mb-4">
+                    <div class="section-title text-center ">
+                        <h3 class="top-c-sep">Questions</h3>
+<p class="mb-30 ff-montserrat">Total de questions : {{number}}</p>
+                    </div>
+                </div>
             </div>
-        </form>
+<div class="row m-4" id="main-question-container">
+    {% for each in questions %}
+    <div class="col-12 p-3" >
+        <div class="card" style="width:18 rem;">
+
+            <div class="card-body">
+
+
+                <span class="badge badge-info tag-filter float-end" id="{{each.tags.slug}}">
+                    {{ each.tags.name }}</span>
+
+                <h5 class="card-title">{{each.title}}</h5>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{% url 'forum:questiondetail' pk=each.pk %}" class="btn btn-primary">Lire plus</a>
+                </div>
+            </div>
+
+        </div>
     </div>
-</div>
-</div>
 
-{% else %}
-<div class="card">
-    <div class="card-body">
 
-        <h4 class="text-danger">Vous n'avez pas assez de point pou répondre à la question!!</h4>
-    </div>
+    {% endfor %}
+
+
 </div>
-{% endif %}
-
 {% endblock content %}
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css" integrity="sha256-3sPp8BkKUE7QyPSl6VfBByBroQbKxKG7tsusY2mhbVY=" crossorigin="anonymous" />
 
 {% block extra_scripts %}

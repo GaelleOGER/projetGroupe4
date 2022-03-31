@@ -66,7 +66,7 @@ class QuestionForm(forms.ModelForm):
 
         title = forms.CharField(max_length=150, required=True,
                                 widget=forms.TextInput(attrs={'class': 'form-control'}))
-        body = forms.CharField(max_length=300, required=True,
+        body = forms.CharField(max_length=1500, required=True,
                                widget=forms.Textarea(attrs={'class': 'form-control'}))
 
 
