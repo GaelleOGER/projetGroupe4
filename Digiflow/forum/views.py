@@ -1,5 +1,5 @@
 # Create your views here.
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View, DeleteView
 from django.contrib.auth.models import User
@@ -8,14 +8,20 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
 
 from .forms import UserRegistrationForm, UserLoginForm, TagForm, AnswerForm, QuestionForm
 
+from django.contrib.auth import logout
 from .models import *
 
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from api.serializers import TagFilterSlugModelSerializer
+
 # Home
+
+
 class HomeView(ListView):
     model = Question
     template_name = "home.html"
@@ -54,8 +60,8 @@ class ProfileDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         auth = self.request.user
         context['amies'] = auth.userprofile.friendlist.count()
-        context['question'] = Question.objects.filter(profile=self.kwargs['pk']).order_by('created_at')
-        context['answer'] = Answer.objects.filter(profile=self.kwargs['pk']).order_by('created_at')
+        context['question'] = Question.objects.filter(user=self.kwargs['pk']).order_by('created_at')
+        context['answer'] = Answer.objects.filter(user=self.kwargs['pk']).order_by('created_at')
         context['date_joind'] = auth.date_joined
         return context
 
@@ -84,7 +90,7 @@ class ProfileListView(ListView):
 class ProfileUpdateView(UpdateView):
     model = Profile
     template_name = 'profile_update.html'
-    fields = ['first_name', 'last_name', 'image', 'bio', 'points']
+    fields = ['first_name', 'last_name', 'bio', 'point']
 
     """def form_valid(self, form):
         form.instance.author = self.request.user
@@ -150,8 +156,8 @@ class QuestionCreateView(CreateView):
     def form_valid(self, form):
         # ici la logique de point
         if self.request.user.userprofile.point != 0:
-            self.request.user.userprofile.point -= 1
-            self.request.user.userprofile.save()
+            self.request.user.userquestion.point -= 1
+            self.request.user.userquestion.save()
             messages.success(self.request, "Votre question a bien été envoyé")
         else:
             messages.error(self.request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")
@@ -225,8 +231,12 @@ def ChangeVoteAnswer(request, *args, **kwargs):
         return redirect(priorURL)
     if toi in answer.answervote.profile.all():
         answer.answervote.profile.remove(toi)
+        answer.user.userprofile.point -= 1
+        answer.user.userprofile.save()
     else:
         answer.answervote.profile.add(toi)
+        answer.user.userprofile.point += 1
+        answer.user.userprofile.save()
     return redirect(priorURL)
 
 
@@ -340,9 +350,14 @@ def ConnectAjax(request, *args, **kwargs):
             return JsonResponse({'data': 'true'})
 
 
-class TagView(ListView):
+class TagView(ListAPIView):
     model = Question
     template_name = 'tag_list.html'
+    queryset = Question.objects.all()
+    serializer_class = TagFilterSlugModelSerializer
+    lookup_field = 'slug'
+    def get_queryset(self):
+        return Question.objects.filter(tags__slug=self.kwargs.get('slug'))
 
     def get_context_data(self, **kwargs):
         for each in Tag.objects.all():
@@ -364,6 +379,10 @@ class TagCreateView(CreateView):
         form = TagForm(request.POST or None)
         form.save()
         return render(request, 'home.html', context={"form": form})
+
+def Logout(request):
+    logout(request)
+    return redirect('forum:login')
 
 
 # pour référence

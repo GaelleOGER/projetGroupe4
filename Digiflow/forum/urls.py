@@ -29,6 +29,7 @@ urlpatterns = [
 
     path('', HomeView.as_view(), name="home"),
     path('list_question', QuestionListView.as_view(), name="forum-question"),
+    path('logout', Logout, name="logout"),
 
 ]
 
