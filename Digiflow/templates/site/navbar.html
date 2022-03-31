@@ -1,56 +1,35 @@
-<nav class="navbar fixed-top navbar-expand-lg navbar-light white scrolling-navbar">
-    <div class="container">
-      <!-- Brand -->
-      <a class="navbar-brand waves-effect" href="/">
-        <strong class="blue-text">Digiflow</strong>
-      </a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse mx-auto navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav ">
-      <li class="nav-item active">
-        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Link</a>
-      </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Dropdown
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link disabled" href="#">Disabled</a>
-      </li>
-    </ul>
-      <!-- Collapse -->
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <!-- Links -->
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <!-- Left -->
-        <ul class="navbar-nav mr-auto">
-          {% comment %} <li class="nav-item active">
-            <a class="nav-link waves-effect" href="/">Home
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link waves-effect" href="/checkout">
-            Checkout</a>
-          </li> {% endcomment %}
-        </ul>
-      </div>
+<div class="container-fluid" style="
+    box-shadow: 1px 1px 12px #aaa;
+    height: 87px;">
+    <div class="row">
+        <div>
+            <h3>Logo</h3>
 
+        </div>
+        <div>
+            <a href="{% url 'forum:question-create' %}">J'ai une question</a>
+        </div>
+        <div class="action">
+            <div class="profile" onclick="menuToggle();">
+                </div>
+            <div class="menu">
+
+                <ul>
+                    <li>
+                        <span class="material-icons icons-size">person</span>
+                        <a href="#">Mon profile</a>
+                    </li>
+                    <li>
+                        <span class="material-icons icons-size">mode</span>
+                        <a href="https://www.w3schools.com/css/css_dropdowns.asp">Modifier profile</a>
+                    </li>
+                    <li>
+                        <span class="material-icons icons-size">insert_comment</span>
+                        <a href="#">Mes questions</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-    </div>
-  </nav>
+
+</div>

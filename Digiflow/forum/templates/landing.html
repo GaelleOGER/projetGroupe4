@@ -1,0 +1,53 @@
+{% extends "site/base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+<div class="container">
+    <h3>Questions</h3>
+    {% for each in questions %}
+    <div class="row" style="margin: 2% 0%">
+        <div class="col-8" style="box-shadow: 1px 1px 12px #aaa; border-radius: 5px;">
+            <p>{{each.title}}</p>
+            </hr>
+            <div class="row">
+                {% if each.created_at >= each.updated_at %}
+                <p>Créer le {{each.created_at}}</p>
+                {% else %}
+                <p>Modifié le {{each.updated_at}}</p>
+                {% endif %}
+                <p>{{each.user}}</p>
+                <p><a class="btn btn-primary" href="{% url 'forum:question-delete' each.pk %}"> Supprimer question</a></p>
+                <p><a class="btn btn-primary" href="{% url 'forum:question-update' pk=each.pk %}"> Modifier question</a></p>
+            </div>
+
+        </div>
+        <div class="col-2" style="box-shadow: 1px 1px 12px #aaa; border-radius: 5px; margin: 0% 4%">
+            <p>{{each.total_votes}}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+<div class="card text-center">
+    <div class="card-header">
+        {% if each.created_at >= each.updated_at %}
+        <p>Créer le {{each.created_at}}</p>
+        {% else %}
+        <p>Modifié le {{each.updated_at}}</p>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">{{each.title}}</h5>
+        <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+        <a class="btn btn-primary"> Modifier question</a>
+        <a class="btn btn-primary" > Supprimer question</a>
+    </div>
+    <div class="card-footer text-muted">
+        2 days ago
+    </div>
+</div>
+{% endblock content %}
+

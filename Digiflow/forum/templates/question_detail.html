@@ -52,6 +52,7 @@
 {% endfor %}
 </div>
 </div>
+{% if request.user.userprofile.point != 0 %}
 <div class="row m-1">
     <div class="col-12">
         <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
@@ -66,5 +67,14 @@
     </div>
 </div>
 </div>
+
+{% else %}
+<div class="card">
+    <div class="card-body">
+
+        <h4 class="text-danger">Vous n'avez pas assez de point pou répondre à la question!!</h4>
+    </div>
+</div>
+{% endif %}
 
 {% endblock content %}

@@ -9,7 +9,7 @@ from django.utils.crypto import get_random_string
 from django.utils.text import slugify
 
 
-class Profiles(models.Model):
+class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='userprofile')
     point = models.PositiveIntegerField(default=10)
     bio = models.CharField(max_length=2000)
@@ -24,36 +24,33 @@ class Profiles(models.Model):
         return str(self.user) or ""
 
     def get_absolute_url(self):
-        return Profiles('account:profile-detail', kwargs={'slug': self.slug})
-
-    def get_friend_list_count(self):
-        return len(self.friendlist.all())
+        return reverse('forum:user-profile', kwargs={'pk': self.pk})
 
     def save(self, *args, **kwargs):
         if self.slug:
-            super(Profiles, self).save(*args, **kwargs)
+            super(Profile, self).save(*args, **kwargs)
         else:
-            self.slug = slugify(self.titre + get_random_string(9))
-            super(Profiles, self).save(*args, **kwargs)
+            self.slug = slugify(str(self.user) + str(get_random_string(9)))
+            super(Profile, self).save(*args, **kwargs)
 
 
 class Friend(models.Model):
-    profile = models.ForeignKey(Profiles, on_delete=models.CASCADE, related_name="friendlist")
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="friendlist")
     friend = models.OneToOneField(User, on_delete=models.CASCADE, related_name="friend")
     is_accepted = models.BooleanField(default=False)
     slug = models.SlugField(null=True, blank=True)
 
     def __str__(self):
-        return str(self.user) or ""
+        return str(self.friend) or ""
 
-    def get_absolute_url(self):
-        return Profiles('account:friend-detail', kwargs={'slug': self.slug})
+    # def get_absolute_url(self):
+    #     return Profile('account:friend-detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         if self.slug:
             super(Friend, self).save(*args, **kwargs)
         else:
-            self.slug = slugify(self.titre + get_random_string(9))
+            self.slug = slugify(str(self.friend) + get_random_string(9))
             super(Friend, self).save(*args, **kwargs)
 
 
@@ -72,7 +69,7 @@ class Tag(models.Model):
 
 
 class Question(models.Model):
-    tags = models.ManyToManyField(Tag, blank=True, related_name='tagsquestion')
+    tags = models.ForeignKey(Tag, blank=True, on_delete=models.CASCADE, null=True, related_name='tagsquestion')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="userquestion")
     profile = models.IntegerField
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -84,12 +81,12 @@ class Question(models.Model):
 
     def get_absolute_url(self):
         return reverse('forum:questiondetail',
-                       kwargs={'pk': self.pk}
-                       )
+                       kwargs={'pk': self.pk})
+
 
 class Vote_Question(models.Model):
     question = models.OneToOneField(Question, on_delete=models.SET_NULL, null=True, related_name="questionvote")
-    profile = models.ManyToManyField(User, related_name="userquestionvote")
+    profile = models.ManyToManyField(User, related_name="userquestionvote", null=True)
 
 
 class Answer(models.Model):
