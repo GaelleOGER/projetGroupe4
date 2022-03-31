@@ -23,6 +23,7 @@ from api.serializers import TagFilterSlugModelSerializer
 
 
 class HomeView(ListView):
+    paginate_by = 5
     model = Question
     template_name = "home.html"
     def get_context_data(self, **kwargs):
@@ -165,6 +166,7 @@ class QuestionCreateView(CreateView):
 
 
 class QuestionListView(ListView):
+    paginate_by = 5
     model = Question
     template_name = "landing.html"
 
