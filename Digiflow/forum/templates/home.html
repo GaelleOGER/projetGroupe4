@@ -7,8 +7,9 @@
 
 <div class="row" id="main-question-filter-container">
     <div class="col-lg-10 mx-auto mb-4">
+        <h1 class="top-l-sep">Bienvenue</h1>
         <div class="section-title text-center ">
-            <h3 class="top-c-sep">Home Page</h3>
+            <h4 class="top-c-sep">Liste des questions</h4>
             <p class="mb-30 ff-montserrat">Total de questions : {{number}}</p>
         </div>
     </div>
@@ -21,6 +22,7 @@
                 <span class="badge badge-info tag-filter float-end" id="{{each.tags.slug}}">
                     {{ each.tags.name }}</span>
                 <h5 class="card-title">{{each.title}}</h5>
+                <h5 class="badge badge-success">{{each.questionvote.profile.count}}</h5>
                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                     <a href="{% url 'forum:questiondetail' pk=each.pk %}" class="btn btn-primary">Lire plus</a>
                 </div>

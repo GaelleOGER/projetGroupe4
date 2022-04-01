@@ -14,9 +14,9 @@
                 <h5>nombre de vote</h5>
                 <span class="badge badge-success">{{object.questionvote.profile.count}}</span>
                 {% if request.user in object.questionvote.profile.all %}
-                <a href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
+                <a class="badge badge-danger" href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
                 {% else %}
-                <a href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
+                <a class="badge badge-dark" href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
                 {% endif %}
             </div>
             <div class="card-footer">

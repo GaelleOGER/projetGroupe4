@@ -26,6 +26,7 @@ class HomeView(ListView):
     paginate_by = 5
     model = Question
     template_name = "home.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         #afficher les 10 premiers elements
@@ -100,24 +101,28 @@ class ProfileUpdateView(UpdateView):
 
 # FRIEND
 
+
 def AddFriendRelationship(request, *args,**kwargs):
+
+    priorURL = request.META.get('HTTP_REFERER')
     object = Profile.objects.get(pk=kwargs['pk'])
     friend = Friend.objects.create(
         profile=request.user.userprofile,
         friend=object.user,
     )
     object.waitinglist.add(request.user)
-    url = reverse_lazy('forum:ajouter-amie')
-    return redirect(url)
+
+    return redirect(priorURL)
 
 
 def RemoveFriendRelationship(request, *args, **kwargs):
+    priorURL = request.META.get('HTTP_REFERER')
     qs1 = Friend.objects.get(friend=User.objects.get(pk=kwargs['pk']), profile=request.user.userprofile)
     qs1.delete()
     qs2 = Friend.objects.get(friend=request.user, profile=User.objects.get(pk=kwargs['pk']))
     qs2.delete()
     url = reverse_lazy('forum:ajouter-amie')
-    return redirect(url)
+    return redirect(priorURL)
 
 
 # def AddAmie(request, *args, **kwargs):
@@ -172,13 +177,10 @@ class QuestionCreateView(CreateView):
     fields = ['title', 'body', 'tags']
 
     def form_valid(self, form):
-        print(self.request.user)
-        print(form)
 
         # ici la logique de point
         if self.request.user.userprofile.point != 0:
             form.instance.user = self.request.user
-
             self.request.user.userprofile.point -= 1
             self.request.user.userprofile.save()
             messages.success(self.request, "Votre question a bien été envoyé")
@@ -402,7 +404,7 @@ class TagCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         form = TagForm(request.POST or None)
         form.save()
-        return render(request, 'home.html', context={"form": form})
+        return render(request, 'landing.html', context={"form": form})
 
 def Logout(request):
     logout(request)
