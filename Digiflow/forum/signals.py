@@ -11,6 +11,7 @@ def user_receiver(sender, instance, created, *args, **kwargs):
 post_save.connect(user_receiver, sender=User)
 
 
+
 def vote_question_receiver(sender, instance, created, *args, **kwargs):
 
     if created:

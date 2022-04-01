@@ -172,9 +172,13 @@ class QuestionCreateView(CreateView):
     fields = ['title', 'body', 'tags']
 
     def form_valid(self, form):
-        print(self.request.user.userprofile.point)
+        print(self.request.user)
+        print(form)
+
         # ici la logique de point
         if self.request.user.userprofile.point != 0:
+            form.instance.user = self.request.user
+
             self.request.user.userprofile.point -= 1
             self.request.user.userprofile.save()
             messages.success(self.request, "Votre question a bien été envoyé")
