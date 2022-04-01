@@ -1,5 +1,5 @@
-<nav class="navbar fixed-top navbar-expand-lg navbar-light " style="background-color: #e3f2fd;">
-    <div class="container-fluid">
+<nav class="navbar fixed-top justify-content navbar-expand-lg navbar-light scrolling-navbar" style="background-color: #e3f2fd;">
+    <div class="container">
         <!-- Brand -->
         <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"
                 class="navbar-toggler"
@@ -16,7 +16,9 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="btn btn-outline-success " href="{% url 'forum:user-profile' pk=user.pk %}">{{ request.user }}</a>
+                    <a class="btn btn-outline-success " href="{% url 'forum:user-profile' pk=user.pk %}">
+                        {{ request.user}}
+                    </a>
                 </li>
 
                 <li class="nav-item">
@@ -25,10 +27,18 @@
                 <li class="nav-item">
                     <a class="btn btn-danger float-right" href="{% url 'forum:logout' %}"> Logout</a>
                 </li>
-                </ul>
+                <li>
+                    <form class="form-inline my-2 my-lg-0">
+                <input aria-label="Search" class="form-control mr-sm-2" placeholder="Search" type="search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+            </form>
+                </li>
 
-                {% else %}
-               <div class="row">
+            </ul>
+
+
+            {% else %}
+            <div class="row">
                 <div class="nav-item"><a class="btn btn-success" href="/login"> Login </a></div>
                 <div class="nav-item"><a class="btn btn-primary" href="/register"> Créer un compte </a></div>
             </div>

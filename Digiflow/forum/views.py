@@ -100,24 +100,41 @@ class ProfileUpdateView(UpdateView):
 
 # FRIEND
 
-def AddAmie(request, *args, **kwargs):
-    priorURL = request.META.get('HTTP_REFERER')
-    user_cliquer = User.objects.get(id=kwargs['pk'])
-    id_user = request.user
-    print(' vous êtes bien passé au bon endroit ')
-    print('plus qua ajouter les conditions')
-    if user_cliquer in request.user.userprofile.friendlist.all():
-        request.user.userprofile.friendlist.remove(user_cliquer)
-        request.user.userprofile.save()
-    else:
-        request.user.userprofile.friendlist.add(user_cliquer)
-        request.user.userprofile.save()
-    '''
-    for each in Profile.objects.all():
-        each.points = 500
-        each.save()
-        '''
-    return redirect(priorURL)
+def AddFriendRelationship(request, *args,**kwargs):
+    object = Profile.objects.get(pk=kwargs['pk'])
+    friend = Friend.objects.create(
+        profile=request.user.userprofile,
+        friend=object.user,
+    )
+    object.waitinglist.add(request.user)
+    url = reverse_lazy('forum:ajouter-amie')
+    return redirect(url)
+
+
+def RemoveFriendRelationship(request, *args, **kwargs):
+    qs1 = Friend.objects.get(friend=User.objects.get(pk=kwargs['pk']), profile=request.user.userprofile)
+    qs1.delete()
+    qs2 = Friend.objects.get(friend=request.user, profile=User.objects.get(pk=kwargs['pk']))
+    qs2.delete()
+    url = reverse_lazy('forum:ajouter-amie')
+    return redirect(url)
+
+
+# def AddAmie(request, *args, **kwargs):
+#     priorURL = request.META.get('HTTP_REFERER')
+#     user_cliquer = User.objects.get(id=kwargs['pk'])
+#     id_user = request.user
+#     print(user_cliquer.userprofile.friendlist)
+#     print(type(user_cliquer))
+#     print(id_user)
+#     if user_cliquer in request.user.userprofile.friendlist:
+#         request.user.userprofile.friendlist.remove(user_cliquer)
+#         request.user.userprofile.save()
+#     else:
+#         request.user.userprofile.friendlist.add(user_cliquer)
+#         request.user.userprofile.save()
+#
+#     return redirect(priorURL)
 
 
 # QUESTION
@@ -152,13 +169,14 @@ def AnswerSubmit(request, *args, **kwargs):
 class QuestionCreateView(CreateView):
     model = Question
     template_name = 'question-create.html'
-    fields = ['title', 'body']
+    fields = ['title', 'body', 'tags']
 
     def form_valid(self, form):
+        print(self.request.user.userprofile.point)
         # ici la logique de point
         if self.request.user.userprofile.point != 0:
-            self.request.user.userquestion.point -= 1
-            self.request.user.userquestion.save()
+            self.request.user.userprofile.point -= 1
+            self.request.user.userprofile.save()
             messages.success(self.request, "Votre question a bien été envoyé")
         else:
             messages.error(self.request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")

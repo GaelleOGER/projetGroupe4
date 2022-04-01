@@ -19,6 +19,36 @@
                     </a>
                 </span>
             </div>
+             {% if request.user == user %}
+            <div class="links">
+                <a href="#" class="btn btn-sm btn-primary">Update Profile</a>
+            </div>
+            {% endif %}
+
+
+            <div class="button">
+                <a href="{% url 'forum:following-list' profile.slug %}" >
+                    <button class="btn1">Following</button>
+                </a>
+             </div>
+
+            <div class="button">
+                <a href="{% url 'forum:follower-list' profile.slug %}" >
+                    <button class="btn1">Followers</button>
+                </a>
+             </div>
+
+            <div class="button">
+                <a href="{% url 'forum:question-create' %}" >
+                    <button class="btn1">J'ai un question</button>
+                </a>
+             </div>
+
+            <div class="button">
+                <a href="{% url 'forum:forum-question' %}" >
+                    <button class="btn1"> Landing </button>
+                </a>
+             </div>
             <div class=" d-flex mt-2">
                 <a href="{% url 'forum:user-profileupdate' pk=object.pk %}" >
                     <button class="btn1">Edit Profile</button>
