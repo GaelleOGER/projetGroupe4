@@ -4,6 +4,9 @@ from .views import *
 
 app_name = 'forum'
 # forum-question = home
+
+
+
 urlpatterns = [
 
     path('<int:pk>/update/', QuestionUpdateView.as_view(), name="question-update"),
@@ -33,6 +36,7 @@ urlpatterns = [
     path('', HomeView.as_view(), name="home"),
     path('list_question', QuestionListView.as_view(), name="forum-question"),
     path('logout', Logout, name="logout"),
+    path('search-question', SearchQuestion, name="search-question"),
 
 ]
 

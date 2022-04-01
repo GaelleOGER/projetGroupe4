@@ -21,26 +21,30 @@
                     </a>
                 </li>
 
-                <li class="nav-item">
+                <li class="nav-item  mx-1">
                     <a class="btn btn-success" href="{% url 'forum:question-create' %}">Poser une question</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item  mx-1">
                     <a class="btn btn-danger float-right" href="{% url 'forum:logout' %}"> Logout</a>
                 </li>
-                <li>
-                    <form class="form-inline my-2 my-lg-0">
-                <input aria-label="Search" class="form-control mr-sm-2" placeholder="Search" type="search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-                </li>
+                  </ul>
 
-            </ul>
+                <div>
+                    <form class="form-inline my-2 my-lg-0 ml-5" method="POST" action="{% url 'forum:search-question' %}">
+                        {% csrf_token %}
+                <input aria-label="Search" class="form-control mr-sm-2" placeholder="Chercher une question"
+                       type="search" name="searched">
+                <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Go</button>
+            </form>
+                </div>
+
+
 
 
             {% else %}
             <div class="row">
-                <div class="nav-item"><a class="btn btn-success" href="/login"> Login </a></div>
-                <div class="nav-item"><a class="btn btn-primary" href="/register"> Créer un compte </a></div>
+                <div class="nav-item"><a class="btn btn-success  mx-2" href="/login"> Login </a></div>
+                <div class="nav-item"><a class="btn btn-primary  mx-2" href="/register"> Créer un compte </a></div>
             </div>
 
             {% endif %}

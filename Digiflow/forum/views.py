@@ -411,6 +411,22 @@ def Logout(request):
     return redirect('forum:login')
 
 
+def SearchQuestion(request, *args, **kwargs):
+
+    if request.method == "POST":
+        searched = request.POST['searched']
+        questions = Question.objects.filter(title__contains=searched)
+        answers = Answer.objects.all()
+
+        return render(request, 'search-question.html',
+                      {'searched': searched,
+                       'questions': questions,
+                       'answers': answers
+                       })
+
+    else:
+        return render(request, 'search-question.html', {})
+
 # pour référence
 def QuestionCreateSurMesure(request, *args, **kwarg):
     piorURL = request.META.HTTP_REFERER
