@@ -11,11 +11,13 @@ from rest_framework_simplejwt.views import (
 from rest_framework import routers
 router = routers.DefaultRouter()
 
+
 app_name = 'api'
 urlpatterns = [
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('', QuestionApiView.as_view(), name='list_question'),
+    path('question_list', QuestionApiView.as_view(), name='question_list'),
+
 ]
 
 from rest_framework.authtoken import views

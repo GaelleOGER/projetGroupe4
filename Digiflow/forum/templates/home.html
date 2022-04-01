@@ -1,0 +1,103 @@
+{% extends "site/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+
+<div class="row" id="main-question-filter-container">
+    <div class="col-lg-10 mx-auto mb-4">
+        <h1 class="top-l-sep">Bienvenue</h1>
+        <div class="section-title text-center ">
+            <h4 class="top-c-sep">Liste des questions</h4>
+            <p class="mb-30 ff-montserrat">Total de questions : {{number}}</p>
+        </div>
+    </div>
+</div>
+<div class="row m-4" id="main-question-container">
+    {% for each in questions %}
+    <div class="col-12 p-3">
+        <div class="card" style="width:18 rem;">
+            <div class="card-body">
+                <span class="badge badge-info tag-filter float-end" id="{{each.tags.slug}}">
+                    {{ each.tags.name }}</span>
+                <h5 class="card-title">{{each.title}}</h5>
+                <h5 class="badge badge-success">{{each.questionvote.profile.count}}</h5>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{% url 'forum:questiondetail' pk=each.pk %}" class="btn btn-primary">Lire plus</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+
+</div>
+{% endblock content %}
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"      integrity="sha256-3sPp8BkKUE7QyPSl6VfBByBroQbKxKG7tsusY2mhbVY=" crossorigin="anonymous"/>
+
+{% block extra_scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+<script>
+console.log("Dans le script")
+$('.tag-filter').click(function(e) {
+        console.log("Dans le script2")
+        e.preventDefault()
+        var crypto = window.localStorage.getItem('access');
+        var wrapperHeader = document.getElementById('main-question-filter-container')
+        var wrapper = document.getElementById('main-question-container')
+        wrapper.innerHTML = ``
+        wrapperHeader.innerHTML = ``
+        console.log("Dans le script3 "+ this.id)
+        var url = '/tag/' + this.id + '/'
+        fetch(url, {'content-type': 'application/json'})
+        .then((resp) => resp.json())
+        .then(function(data){
+                    console.log("Dans le script")
+                    console.log(data)
+
+        var tagName = `${data[0].tags.name}`
+            wrapperHeader.innerHTML += `
+             <div class="col-lg-10 mx-auto mb-4">
+                    <div class="section-title text-center ">
+                        <h3 class="top-c-sep">QUESTIONS POUR # ${tagName}</h3>
+<p class="mb-30 ff-montserrat">Total de questions : ${data.length}</p>
+                    </div>
+                </div>
+            </div>
+            `
+            console.log('Data:', data)
+            var list = data
+            for (var i in list){
+
+                var pk = `${list[i].pk}`
+                var title = `${list[i].title}`
+                var body = `${list[i].body}`
+                var tags = `${list[i].tags.name}`
+                var tagslug = `${list[i].tags.slug}`
+                var item = ` <div class="col-12 p-3">
+                                <div class="card" style="width:18 rem;">
+                                    <div class="card-body">
+                                        <span class="badge badge-info float-end" id="${tagslug}">
+                                        ${tags}
+                                        </span>
+
+                                        <h5 class="card-title">${title}</h5>
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <a href="/question/${pk}/" class="btn btn-primary">Lire plus</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                `
+                wrapper.innerHTML += item
+            }
+            console.log("Dans le script4")},
+        )},
+
+);
+
+
+</script>
+{% endblock %}

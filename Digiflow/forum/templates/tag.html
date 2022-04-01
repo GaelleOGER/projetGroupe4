@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "site/base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
 
-</body>
-</html>
+<h5 class="mt-5">Questions par Tag</h5>
+<ul>
+    {% for each in tags %}
+        <li>
+            <span id="{{each.slug}}" class="tag-filter">{{ each.name }}</span>
+        </li>
+    {% endfor %}
+</ul>
+<div>
+    <a class="btn btn-success" href="{% url 'forum:tag-create' %}">
+    créer un tagg
+    </a>
+</div>
+
+{% endblock content %}

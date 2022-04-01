@@ -5,10 +5,11 @@ from .models import Profile, Question, Vote_Question, Answer, Vote_Answer
 def user_receiver(sender, instance, created, *args, **kwargs):
 
     if created:
-        Profile.objects.create(user=instance)
+        Profile.objects.create(user=instance, first_name=instance.username)
 
 
 post_save.connect(user_receiver, sender=User)
+
 
 
 def vote_question_receiver(sender, instance, created, *args, **kwargs):

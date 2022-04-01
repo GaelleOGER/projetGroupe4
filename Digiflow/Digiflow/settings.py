@@ -82,6 +82,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'builtins':['forum.templatetags.template_tags'],
         },
     },
 ]
@@ -174,5 +175,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-  
+LOGOUT_REDIRECT_URL = "home"
+
 

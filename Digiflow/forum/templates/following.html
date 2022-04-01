@@ -1,22 +1,82 @@
 {% extends "site/base.html" %}
-
 {% load static %}
 {% load crispy_forms_tags %}
-
 {% block content %}
+<link href="{% static 'base.css' %}" rel="stylesheet" />
 
-<div class="row m-4">
-    {% if request.user.is_active == following_.user %}
-    {% for each in following_ %}
-        <div class="col-3 p-3">
+<div class="container">
+    <div class="row">
+        <div class="col-md-12 col-lg-60">
             <div class="card">
-                  <div class="card-body">
-                    <h5 class="card-title">{{ following_.following }}</h5>
-                  </div>
+                <div class="p-4">
+                    <div class="d-flex flex-row">
+                        <div class=""><img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="user" class="rounded-circle" width="100" /></div>
+                        <div class="pl-4">
+                            <h3>{{ object.first_name }}  {{ object.last_name }} </h3>
+                            <h4>{{ object.bio }}</h4>
+                            <p class="text-center aboutscroll">
+                               <button class="btn text-uppercase font-14"> J'ai une question</button>
+                            </p>
+                             <p class="text-center aboutscroll">
+                            <button class="btn text-uppercase font-14"><i class="fa fa-home"></i> Home</button>
+                              </p>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col border-right text-center">
+                            <h2 class="font-light">{{ object.following.count }}</h2>
+                            <h4 class="text-uppercase">Following</h4>
+                        </div>
+                        <div class="col border-right text-center">
+                            <h2 class="font-light">{{ object.follower.count }}</h2>
+                            <h4 class="text-uppercase">Followers</h4>
+                        </div>
+                        <div class="col text-center">
+                            <h2 class="font-light">{{ object.point }}</h2>
+                            <h4 class="text-uppercase">Points</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-top">
+                    <hr />
+                    <h4 class="font-medium text-center mt-4">Following</h4>
+
+                    {% for each in object.following.all %}
+                    <div class="container">
+    <div class="row">
+        <div class="col-md-12 col-lg-8">
+            <div class="card">
+                <div class="p-4">
+                    <div class="d-flex flex-row">
+                        <div class=""><img src="#" alt="user" class="rounded-circle" width="70" /></div>
+                        <div class="pl-4">
+                            <button class="btn text-uppercase font-14"><h5>{{ each.userprofile.first_name }}  {{ each.userprofile.last_name }}</h5> <button>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        <div class="col border-right text-center">
+                            <h6 class="font-light">{{ each.userprofile.following.count }}</h6>
+                            <h6 class="text-uppercase">Following</h6>
+                        </div>
+                        <div class="col border-right text-center">
+                            <h6 class="font-light">{{ each.userprofile.follower.count }}</h6>
+                            <h6 class="text-uppercase">Followers</h6>
+                        </div>
+                        <div class="col text-center">
+                            <h6 class="font-light">{{ each.userprofile.point }}</h6>
+                            <h6 class="text-uppercase">Points</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body border-top">
+                    <hr />
+                </div>
             </div>
         </div>
-    {% endfor %}
-    {% endif %}
-</div>
+         {% endfor %}
+
+                </div>
+            </div>
+        </div>
 
 {% endblock content %}
