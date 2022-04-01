@@ -1,5 +1,5 @@
 # Create your views here.
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, View, DeleteView
 from django.contrib.auth.models import User
@@ -8,18 +8,40 @@ from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from rest_framework.permissions import AllowAny
-from rest_framework.views import APIView
 
 from .forms import UserRegistrationForm, UserLoginForm, TagForm, AnswerForm, QuestionForm
 
+from django.contrib.auth import logout
 from .models import *
+
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
+from api.serializers import TagFilterSlugModelSerializer
+
+# Home
+
+
+class HomeView(ListView):
+    paginate_by = 5
+    model = Question
+    template_name = "home.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #afficher les 10 premiers elements
+        context['tags'] = Tag.objects.all()[:10]
+        context['questions'] = Question.objects.all()
+        context['number'] = len(Question.objects.all())
+        return context
+
 
 # PROFILE
 """def profile(request):
     profile = Profile.objects.all()
 
     return render(request,'profile.html', {'profile':profile})"""
+
 
 
 class ProfileCreateView(CreateView):
@@ -40,8 +62,8 @@ class ProfileDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         auth = self.request.user
         context['amies'] = auth.userprofile.friendlist.count()
-        context['question'] = Question.objects.filter(profile=self.kwargs['pk']).order_by('created_at')
-        context['answer'] = Answer.objects.filter(profile=self.kwargs['pk']).order_by('created_at')
+        context['question'] = Question.objects.filter(user=self.kwargs['pk']).order_by('created_at')
+        context['answer'] = Answer.objects.filter(user=self.kwargs['pk']).order_by('created_at')
         context['date_joind'] = auth.date_joined
         return context
 
@@ -70,7 +92,7 @@ class ProfileListView(ListView):
 class ProfileUpdateView(UpdateView):
     model = Profile
     template_name = 'profile_update.html'
-    fields = ['first_name', 'last_name', 'image', 'bio', 'points']
+    fields = ['first_name', 'last_name', 'bio', 'point']
 
     """def form_valid(self, form):
         form.instance.author = self.request.user
@@ -79,24 +101,45 @@ class ProfileUpdateView(UpdateView):
 
 # FRIEND
 
-def AddAmie(request, *args, **kwargs):
+
+def AddFriendRelationship(request, *args,**kwargs):
+
     priorURL = request.META.get('HTTP_REFERER')
-    user_cliquer = User.objects.get(id=kwargs['pk'])
-    id_user = request.user
-    print(' vous êtes bien passé au bon endroit ')
-    print('plus qua ajouter les conditions')
-    if user_cliquer in request.user.userprofile.friendlist.all():
-        request.user.userprofile.friendlist.remove(user_cliquer)
-        request.user.userprofile.save()
-    else:
-        request.user.userprofile.friendlist.add(user_cliquer)
-        request.user.userprofile.save()
-    '''
-    for each in Profile.objects.all():
-        each.points = 500
-        each.save()
-        '''
+    object = Profile.objects.get(pk=kwargs['pk'])
+    friend = Friend.objects.create(
+        profile=request.user.userprofile,
+        friend=object.user,
+    )
+    object.waitinglist.add(request.user)
+
     return redirect(priorURL)
+
+
+def RemoveFriendRelationship(request, *args, **kwargs):
+    priorURL = request.META.get('HTTP_REFERER')
+    qs1 = Friend.objects.get(friend=User.objects.get(pk=kwargs['pk']), profile=request.user.userprofile)
+    qs1.delete()
+    qs2 = Friend.objects.get(friend=request.user, profile=User.objects.get(pk=kwargs['pk']))
+    qs2.delete()
+    url = reverse_lazy('forum:ajouter-amie')
+    return redirect(priorURL)
+
+
+# def AddAmie(request, *args, **kwargs):
+#     priorURL = request.META.get('HTTP_REFERER')
+#     user_cliquer = User.objects.get(id=kwargs['pk'])
+#     id_user = request.user
+#     print(user_cliquer.userprofile.friendlist)
+#     print(type(user_cliquer))
+#     print(id_user)
+#     if user_cliquer in request.user.userprofile.friendlist:
+#         request.user.userprofile.friendlist.remove(user_cliquer)
+#         request.user.userprofile.save()
+#     else:
+#         request.user.userprofile.friendlist.add(user_cliquer)
+#         request.user.userprofile.save()
+#
+#     return redirect(priorURL)
 
 
 # QUESTION
@@ -131,28 +174,23 @@ def AnswerSubmit(request, *args, **kwargs):
 class QuestionCreateView(CreateView):
     model = Question
     template_name = 'question-create.html'
-    fields = ['title', 'body']
+    fields = ['title', 'body', 'tags']
 
     def form_valid(self, form):
-        form.instance.author = self.request.user
+
         # ici la logique de point
-        form = QuestionForm(self.request.POST or None)
         if self.request.user.userprofile.point != 0:
-
-            if form.is_valid():
-                form.save()
-                self.request.user.userprofile.point -= 1
-                self.request.user.userprofile.save()
-                messages.success(self.request, "Votre question a bien été envoyé")
-                return redirect('forum:forum-question')
-            else:
-                messages.error(self.request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")
-                return render(self.request, 'question-create.html')
-
-        return super().form_valid(self, form)
+            form.instance.user = self.request.user
+            self.request.user.userprofile.point -= 1
+            self.request.user.userprofile.save()
+            messages.success(self.request, "Votre question a bien été envoyé")
+        else:
+            messages.error(self.request, "Votre question n'a pas pu être envoyée, votre fomulaire n'est pas bon")
+        return super().form_valid(form)
 
 
 class QuestionListView(ListView):
+    paginate_by = 5
     model = Question
     template_name = "landing.html"
 
@@ -189,7 +227,7 @@ class QuestionDeleteView(DeleteView):
 # et la meme chose pour les reponse
 
 
-def ChangeVoteReponse(request, *args, **kwargs):
+def ChangeVoteQuestion(request, *args, **kwargs):
     priorURL = request.META.get('HTTP_REFERER')
     question = Question.objects.get(id=kwargs['pk'])
     toi = request.user
@@ -199,9 +237,12 @@ def ChangeVoteReponse(request, *args, **kwargs):
         return redirect(priorURL)
     if toi in question.questionvote.profile.all():
         question.questionvote.profile.remove(toi)
+        request.user.userprofile.point -= 1
+        request.user.userprofile.save()
     else:
         question.questionvote.profile.add(toi)
-
+        request.user.userprofile.point += 1
+        request.user.userprofile.save()
         return redirect(priorURL)
     return redirect(priorURL)
 
@@ -216,34 +257,23 @@ def ChangeVoteAnswer(request, *args, **kwargs):
         return redirect(priorURL)
     if toi in answer.answervote.profile.all():
         answer.answervote.profile.remove(toi)
+        answer.user.userprofile.point -= 1
+        answer.user.userprofile.save()
     else:
         answer.answervote.profile.add(toi)
+        answer.user.userprofile.point += 1
+        answer.user.userprofile.save()
     return redirect(priorURL)
-
-
-def home(request, *args, **kwargs):
-    return HttpResponse('<h1>Bonjour</h1>')
 
 
 class FollowingListOfUser(DetailView):
     model = Profile
     template_name = 'following.html'
-    print(Profile.user)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['following'] = Profile.objects.all()
-        print(context)
-        return context
 
 
 class FollowerListOfUser(DetailView):
     model = Profile
     template_name = 'follower.html'  # object.follower.all, object.following.all dans template in for loop
-    """def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['follower_'] = Profile.objects.all()
-        return context"""
 
 
 class UserRegistrationView(View):
@@ -346,14 +376,14 @@ def ConnectAjax(request, *args, **kwargs):
             return JsonResponse({'data': 'true'})
 
 
-class HomeView(ListView):
-    model = Question
-    template_name = "home.html"
-
-
-class TagView(ListView):
+class TagView(ListAPIView):
     model = Question
     template_name = 'tag_list.html'
+    queryset = Question.objects.all()
+    serializer_class = TagFilterSlugModelSerializer
+    lookup_field = 'slug'
+    def get_queryset(self):
+        return Question.objects.filter(tags__slug=self.kwargs.get('slug'))
 
     def get_context_data(self, **kwargs):
         for each in Tag.objects.all():
@@ -374,7 +404,11 @@ class TagCreateView(CreateView):
     def post(self, request, *args, **kwargs):
         form = TagForm(request.POST or None)
         form.save()
-        return render(request, 'home.html', context={"form": form})
+        return render(request, 'landing.html', context={"form": form})
+
+def Logout(request):
+    logout(request)
+    return redirect('forum:login')
 
 
 # pour référence

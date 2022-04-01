@@ -1,4 +1,13 @@
-<h5>Side bar</h5>
+<h5 class="mt-5">Questions par Tag</h5>
 <ul>
-
-    </ul>
+    {% for each in tags %}
+        <li>
+            <span id="{{each.slug}}" class="tag-filter">{{ each.name }}</span>
+        </li>
+    {% endfor %}
+</ul>
+<div>
+    <a class="btn btn-success" href="{% url 'forum:tag-create' %}">
+    créer un tagg
+    </a>
+</div>

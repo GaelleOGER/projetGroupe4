@@ -4,69 +4,71 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="card  shadow rounded">
-        <div class="card-body">
-            <h1 class=""><strong>{{object.title}}</strong></h1>
-            <p>{{ object.body }}</p>
-            <p>{{ object.created_at }}</p>
-            <h5>nombre de vote</h5>
-            <span class="badge badge-success">{{object.questionvote.profile.count}}</span>
-        </div>
-        <div>
-            {% if request.user in object.questionvote.profile.all %}
-            <a href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
-            {% else %}
-            <a href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
-            {% endif %}
-        </div>
-        <div class="card-footer">
-            <a class="btn btn-danger" href="#">
-                retour au questions
-            </a>
-        </div>
-    </div>
-</div>
-
-
-<div class="container-fluid">
-    {% for each in object.questionanswer.all %}
-    <div class="row">
-        <div class="card shadow rounded">
-            <p class="card-body">R</p>
-        </div>
-    </div>
-</div>
-<div class="card shadow rounde">
-    <div class="card-body">
-        <p>{{ each.body }}</p>
-
-        <div>
-            <h5>nombre de vote</h5>
-            <span class="badge badge-success">{{each.answervote.profile.count}}</span>
-            <a href="{% url 'forum:answer-vote' pk=each.pk %}">vote</a>
-        </div>
-        <span>{{ each.created_at|date:"D d M Y" }}</span>
-    </div>
-</div>
-{% endfor %}
-</div>
-</div>
-{% if request.user.userprofile.point != 0 %}
-<div class="row m-1">
+<div class="row">
     <div class="col-12">
-        <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
-        <form action="{% url 'forum:answer-create' id=object.id %}"  method="POST">
-            <div>
-                {% csrf_token %}
-                {% crispy form %}
-
-                <button class="btn btn-success mt-3 ml-3" type="submit"> Envoyer</button>
+        <div class="card  shadow rounded">
+            <div class="card-body">
+                <h1 class=""><strong>{{object.title}}</strong></h1>
+                <p>{{ object.body }}</p>
+                <p>{{ object.created_at }}</p>
+                <h5>nombre de vote</h5>
+                <span class="badge badge-success">{{object.questionvote.profile.count}}</span>
+                {% if request.user in object.questionvote.profile.all %}
+                <a class="badge badge-danger" href="{% url 'forum:question-vote' pk=object.pk %}">unvote</a>
+                {% else %}
+                <a class="badge badge-dark" href="{% url 'forum:question-vote' pk=object.pk %}">vote</a>
+                {% endif %}
             </div>
-        </form>
+            <div class="card-footer">
+                <a class="btn btn-danger" href="{% url 'forum:home' %}">
+                    retour au questions
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+<div class="row">
+    {% for each in object.questionanswer.all %}
+    <div class="col-12 mt-3 row">
+        <div class="col-2 ">
+            <div class="card mx-3 shadow rounded">
+                <p class="card-body" style="font-size: calc(1.5rem + 2.3vw); font-weight: 900;">R</p>
+            </div>
+        </div>
+        <div class="col-10 ">
+            <div class="card mr-3 shadow rounded">
+                <div class="card-body">
+                    <p>{{ each.body }}</p>
+                    <div>
+                        <h5>nombre de vote</h5>
+                        <span class="badge badge-success">{{each.answervote.profile.count}}</span>
+                        <a href="{% url 'forum:answer-vote' pk=each.pk %}">vote</a>
+                    </div>
+                    <span>{{ each.created_at|date:"D d M Y" }}</span>
+                </div>
+            </div>
+            </div>
+        </div>
+
+    {% endfor %}
 </div>
+
+<div class="card m-3">
+    <div class="card-body">
+        {% if request.user.userprofile.point != 0 %}
+    <div class="row m-1">
+        <div class="col-12">
+            <h4 class="mb-4 "> Veuillez créer une nouvelle réponse </h4>
+            <form action="{% url 'forum:answer-create' id=object.id %}" method="POST">
+                <div>
+                    {% csrf_token %}
+                    {% crispy form %}
+
+                    <button class="btn btn-success mt-3 ml-3" type="submit"> Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 {% else %}
 <div class="card">
@@ -77,4 +79,66 @@
 </div>
 {% endif %}
 
+    </div>
+    </div>
+
+
+
 {% endblock content %}
+
+<link crossorigin="anonymous"
+      href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css"
+      integrity="sha256-3sPp8BkKUE7QyPSl6VfBByBroQbKxKG7tsusY2mhbVY=" rel="stylesheet"/>
+
+{% block extra_scripts %}
+<script crossorigin="anonymous"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+console.log("Dans le script")
+$('.tag-filter').click(function(e) {
+        console.log("Dans le script2")
+        e.preventDefault()
+        var crypto = window.localStorage.getItem('access');
+        var wrapper = document.getElementById('main-question-container')
+        wrapper.innerHTML = ``
+        console.log("Dans le script3 "+ this.id)
+        var url = '/tag/' + this.id + '/'
+        fetch(url, {'content-type': 'application/json', Authorization: 'Bearer ' + crypto})
+        .then((resp) => resp.json())
+        .then(function(data){
+            console.log('Data:', data)
+            var list = data
+            for (var i in list){
+
+                var pk = `${list[i].pk}`
+                var title = `${list[i].title}`
+                var body = `${list[i].body}`
+                var tags = `${list[i].tags.name}`
+                var tagslug = `${list[i].tags.slug}`
+                var item = `                    <div class="col-12 p-3">
+                           <span class="badge badge-info tag" style="position:relative;top: 30px;left: 10px;z-index: 1000" id="${tagslug}">
+                                    ${tags}
+                                </span>
+                        <div class="card">
+                            <div class="card-body">
+
+
+
+                                <h5 class="card-title">${title}</h5>
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="/question/${pk}/" class="btn btn-primary">Lire plus</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+                wrapper.innerHTML += item
+            }
+            console.log("Dans le script4")},
+        )},
+
+);
+
+
+</script>
+{% endblock %}

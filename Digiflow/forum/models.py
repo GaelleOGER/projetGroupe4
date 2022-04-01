@@ -58,6 +58,9 @@ class Tag(models.Model):
     name = models.CharField(max_length=150)
     slug = models.SlugField(null=True, blank=True)
 
+    def __str__(self):
+        return str(self.name) or ""
+
     def save(self, *args, **kwargs):
         if self.slug and self.name.isupper():
             self.name =self.name.upper()
@@ -71,7 +74,6 @@ class Tag(models.Model):
 class Question(models.Model):
     tags = models.ForeignKey(Tag, blank=True, on_delete=models.CASCADE, null=True, related_name='tagsquestion')
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="userquestion")
-    profile = models.IntegerField
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     title = models.CharField(max_length=150)
     body = models.CharField(max_length=500)
@@ -92,7 +94,6 @@ class Vote_Question(models.Model):
 class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, related_name="questionanswer")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="useranswer")
-    profile = models.IntegerField
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     body = models.CharField(max_length=550)
 
